@@ -5,3 +5,105 @@ body {
 .avatar {
     max-width: 100%;
 }
+
+.post-author {
+    margin-top: 20px;
+}
+
+.post-image-container {
+    display: flex;
+    justify-content: center;
+}
+
+.post-image {
+    max-width: 800px;
+}
+
+.post-text {
+    padding: 40px 40px 5px 40px;
+}
+
+.post-comment-container {
+    width: 100%;
+    border: 1px black solid;
+    margin: 0px 40px;
+}
+
+.container-text {
+    border-bottom: 1px solid black;
+    background-color: rgb(241 241 241);
+}
+
+.post-label {
+    display: block;
+    padding: 10px 25px;
+    margin: 0;
+}
+
+.container-comment {
+    padding: 20px 25px;
+}
+
+#comment {
+    display: block;
+    margin-bottom: 20px;
+    width: 100%;
+    height: 100px;
+}
+
+.submit-button {
+    width: 150px;
+    height: 45px;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    background-color: rgb(0, 123, 255);
+}
+
+.comments-section {
+    padding: 40px;
+}
+
+.comment {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.comment-avatar {
+    width: 50px;
+    height: 50px;
+    background-color: #ccc;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.comment-content {
+    max-width: 1000px;
+}
+
+.comment-author {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.comment-text {
+    margin: 5px 0;
+}
+
+.replies {
+    margin-left: 60px;
+    border-left: 2px solid #ddd;
+    padding-left: 10px;
+}
+
+.comment.reply {
+    margin-top: 10px;
+}
+
+footer p {
+    padding: 20px;
+    text-align: center;
+    color: white;
+    margin: 0;
+}

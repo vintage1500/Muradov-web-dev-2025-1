@@ -1,0 +1,5 @@
+lab1/ve
+lab1/app/__pycache__
+lab1/app/.pytest_cache
+lab1/tests/__pycache__
+lab1/app/__init__.py
