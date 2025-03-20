@@ -9,33 +9,50 @@ def client():
         with app.app_context():
             yield client
 
-def test_index_page_html(client):
+def test_index_page_status_code(client):
     response = client.get(url_for('index'))
     assert response.status_code == 200
+
+def test_index_page_html(client):
+    response = client.get(url_for('index')) 
     assert b'<!doctype html>' in response.data
 
-def test_about_page(client):
+def test_about_page_status_code(client):
     response = client.get(url_for('about'))
-    assert response.status_code == 200
+    assert response.status_code == 200 
+
+def test_about_page_html(client):
+    response = client.get(url_for('about')) 
     assert b'<!doctype html>' in response.data
+
+def test_about_page_html_tag(client):
+    response = client.get(url_for('about')) 
     response_text = response.data.decode('utf-8').strip()
     assert '<h1 class="mt-5 text-center">Об авторе</h1>' in response_text
 
-def test_posts_page(client):
+def test_posts_page_status_code(client):
     response = client.get(url_for('posts'))
-    assert response.status_code == 200
+    assert response.status_code == 200  
+
+def test_posts_page_html(client):
+    response = client.get(url_for('posts')) 
     assert b'<!doctype html>' in response.data
+
+def test_posts_page_html_tag(client):
+    response = client.get(url_for('posts')) 
     response_text = response.data.decode('utf-8').strip()
     assert '<h1 class="my-5">Последние посты</h1>' in response_text
 
-def test_post_page(client):
+def test_post_page_status_code(client):
     response = client.get(url_for('post', index=0))
     assert response.status_code == 200
+
+def test_post_page_html(client):
+    response = client.get(url_for('post', index=0))
     assert b'<!doctype html>' in response.data
 
-def test_index_page_post(client): 
-    response = client.get(url_for('post', index=1))
-    assert response.status_code == 200
+def test_page_post_comment_title(client): 
+    response = client.get(url_for('post', index=1)) 
     response_text = response.data.decode('utf-8').strip()
     assert 'Оставьте комментарий' in response_text
 
@@ -46,8 +63,7 @@ def test_posts_page_title(client):
 
 def test_post_page_data(client):
     post = posts_list[0]
-    response = client.get(url_for('post', index=0))
-    assert response.status_code == 200
+    response = client.get(url_for('post', index=0)) 
     assert post['title'].encode() in response.data
     assert post['text'][:50].encode() in response.data
     assert post['author'].encode() in response.data
@@ -58,8 +74,7 @@ def test_non_existent_post(client):
 
 def test_post_image_loading(client):
     post = posts_list[0]
-    response = client.get(url_for('post', index=0))
-    assert response.status_code == 200
+    response = client.get(url_for('post', index=0)) 
     assert f'src="{url_for("static", filename="images/" + post["image_id"])}"'.encode() in response.data
 
 def test_redirect_on_invalid_url(client):
