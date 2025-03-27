@@ -5,14 +5,7 @@ from werkzeug.middleware.dispatcher import DispatcherMiddleware
 app = Flask(__name__)
 application = app
 
-@app.before_request
-def fix_script_name():
-    if 'SCRIPT_NAME' in app.config:
-        app.wsgi_app = DispatcherMiddleware(None, {app.config['SCRIPT_NAME']: app.wsgi_app})
-
-app.config["SERVER_NAME"] = 'vintage150.pythonanywhere.com' 
-app.config['SCRIPT_NAME'] = '/lab2'
-app.config['APPLICATION_ROOT'] = '/lab2'
+app.config["SERVER_NAME"] = 'vintage150.pythonanywhere.com'  
 
 @app.route('/')
 def index():
