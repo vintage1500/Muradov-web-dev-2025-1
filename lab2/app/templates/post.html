@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<p class="post-author">{{ post.author }}, {{ post.date }}</p>
+<div class="post-image-container">
+    <img class="post-image" src="{{ url_for('static', filename='images/' + post.image_id) }}" alt="Image">
+</div>
+<div class="description-container">
+    <p class="post-text">{{ post.text }}</p>
+    <div class="post-comment-container">
+        <div class="container-text">
+            <label class="post-label" for="comment">Оставьте комментарий</label>
+        </div>
+        <div class="container-comment">
+            <textarea id="comment" rows="4"></textarea>
+            <button class="submit-button">Отправить</button>
+        </div>
+    </div>
+</div>
+
+<div class="comments-section">
+    {% for comment in post.comments %}
+        <div class="comment">
+            <div class="comment-avatar"></div>
+            <div class="comment-content">
+                <p class="comment-author"><strong>{{ comment.author }}</strong></p>
+                <p class="comment-text">{{ comment.text }}</p>
+            </div>
+        </div>
+        
+        {% if comment.replies %}
+            <div class="replies">
+                {% for reply in comment.replies %}
+                    <div class="comment reply">
+                        <div class="comment-avatar"></div>
+                        <div class="comment-content">
+                            <p class="comment-author"><strong>{{ reply.author }}</strong></p>
+                            <p class="comment-text">{{ reply.text }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}
