@@ -8,9 +8,8 @@ fake = Faker()
 app = Flask(__name__)
 application = app
 
-app.config["SERVER_NAME"] = 'vintage150.pythonanywhere.com'
-# app.config["SERVER_NAME"] = '127.0.0.1:5000'
-
+app.config["SERVER_NAME"] = 'vintage150.pythonanywhere.com' 
+app.config['SCRIPT_NAME'] = '/lab1'
 
 images_ids = ['7d4e9175-95ea-4c5f-8be5-92a6b708bb3c',
               '2d2ab7df-cdbc-48a8-a936-35bba702def5',
