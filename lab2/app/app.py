@@ -1,58 +1,61 @@
-import random
-from flask import Flask, render_template, abort
-from faker import Faker
-
-fake = Faker()
+import re
+from flask import Flask, render_template, request, make_response
 
 app = Flask(__name__)
 application = app
 
 # app.config["SERVER_NAME"] = 'vintage150.pythonanywhere.com'
 app.config["SERVER_NAME"] = '127.0.0.1:5000'
-
-
-images_ids = ['7d4e9175-95ea-4c5f-8be5-92a6b708bb3c',
-              '2d2ab7df-cdbc-48a8-a936-35bba702def5',
-              '6e12f3de-d5fd-4ebb-855b-8cbc485278b7',
-              'afc2cfe7-5cac-4b80-9b9a-d5c65ef0c728',
-              'cab5b7f2-774e-4884-a200-0c0180fa777f']
-
-def generate_comments(replies=True):
-    comments = []
-    for i in range(random.randint(1, 3)):
-        comment = { 'author': fake.name(), 'text': fake.text() }
-        if replies:
-            comment['replies'] = generate_comments(replies=False)
-        comments.append(comment)
-    return comments
-
-def generate_post(i):
-    return {
-        'title': 'Заголовок поста',
-        'text': fake.paragraph(nb_sentences=100),
-        'author': fake.name(),
-        'date': fake.date_time_between(start_date='-2y', end_date='now'),
-        'image_id': f'{images_ids[i]}.jpg',
-        'comments': generate_comments()
-    }
-
-posts_list = sorted([generate_post(i) for i in range(5)], key=lambda p: p['date'], reverse=True)
-
+ 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    msg = request.url
+    return render_template('base.html', msg=msg)
 
-@app.route('/posts')
-def posts():
-    return render_template('posts.html', title='Посты', posts=posts_list)
+@app.route('/params')
+def params(): 
+    return render_template('params.html')
 
-@app.route('/posts/<int:index>')
-def post(index):
-    if index < 0 or index >= len(posts_list):
-        abort(404)
-    p = posts_list[index]
-    return render_template('post.html', title=p['title'], post=p) 
+@app.route('/headers')
+def headers(): 
+    return render_template('headers.html', headers=request.headers)
 
-@app.route('/about')
-def about():
-    return render_template('about.html', title='Об авторе')
+@app.route('/cookies')
+def cookies(): 
+    resp = make_response(render_template('cookies.html'))
+    if 'name' not in request.cookies:
+        resp.set_cookie('name', 'Same')
+    else:
+        resp.set_cookie('name', expires=0)
+    return resp
+
+@app.route('/form', methods=['GET', 'POST'])
+def form(): 
+    return render_template('form.html')
+
+def format_phone_number(phone):
+    digits = re.sub(r'\D', '', phone)  
+    if len(digits) == 11 and (digits.startswith('7') or digits.startswith('8')):
+        digits = '8' + digits[1:]
+    elif len(digits) == 10:
+        digits = '8' + digits
+    return f"{digits[0]}-{digits[1:4]}-{digits[4:7]}-{digits[7:9]}-{digits[9:]}"
+
+
+@app.route("/phone", methods=["GET", "POST"])
+def phone_form():
+    error = None
+    formatted_number = None
+    
+    if request.method == "POST":
+        phone = request.form.get("phone", "")
+        digits = re.sub(r'\D', '', phone)  
+        
+        if not re.match(r'^[\d+().\s-]+$', phone):
+            error = "Недопустимый ввод. В номере телефона встречаются недопустимые символы."
+        elif not (len(digits) == 11 and (digits.startswith("7") or digits.startswith("8")) or len(digits) == 10):
+            error = "Недопустимый ввод. Неверное количество цифр."
+        else:
+            formatted_number = format_phone_number(phone)
+    
+    return render_template("phone_form.html", error=error, formatted_number=formatted_number)
