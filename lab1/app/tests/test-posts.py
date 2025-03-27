@@ -1,6 +1,6 @@
 import pytest
 from flask import url_for
-from root_app.app.app import app, posts_list
+from app import app, posts_list
 
 
 @pytest.fixture
@@ -58,11 +58,11 @@ def test_page_post_comment_title(client):
 
 def test_posts_page_title(client):
     response = client.get(url_for('posts'))
-    for post in posts_list:
+    for post in posts_list():
         assert post['title'].encode() in response.data
 
 def test_post_page_data(client):
-    post = posts_list[0]
+    post = posts_list()[0]
     response = client.get(url_for('post', index=0)) 
     assert post['title'].encode() in response.data
     assert post['text'][:50].encode() in response.data
@@ -73,7 +73,7 @@ def test_non_existent_post(client):
     assert response.status_code == 404
 
 def test_post_image_loading(client):
-    post = posts_list[0]
+    post = posts_list()[0]
     response = client.get(url_for('post', index=0)) 
     assert f'src="{url_for("static", filename="images/" + post["image_id"])}"'.encode() in response.data
 
@@ -81,3 +81,42 @@ def test_redirect_on_invalid_url(client):
     response = client.get('/some_invalid_url')
     assert response.status_code == 404  
 
+def test_posts_index(client):
+    response = client.get("/posts")
+    assert response.status_code == 200
+    assert "Последние посты" in response.data.decode("utf-8")
+
+def test_posts_index_template(client, captured_templates, mocker, posts_list):
+    with captured_templates as templates:
+        mocker.patch(
+            "app.posts_list",
+            return_value=posts_list,
+            autospec=True
+        )
+        
+        _ = client.get('/posts')
+        assert len(templates) == 1
+        template, context = templates[0]
+        assert template.name == 'posts.html'
+        assert context['title'] == 'Посты'
+        assert len(context['posts']) == 1
+
+def test_posts_index_data(client, captured_templates, mocker, posts_list):
+    with captured_templates as templates:
+        mocker.patch(
+            "app.posts_list",
+            return_value=posts_list,
+            autospec=True
+        )
+        
+        _ = client.get('/posts')
+        context = templates[0]
+        assert 'posts' in context   
+        assert isinstance(context['posts'], list)  
+        assert len(context['posts']) == len(posts_list)
+        expected_post = posts_list[0]
+        actual_post = context['posts'][0]
+        assert actual_post['author'] == expected_post['author']
+        assert actual_post['text'] == expected_post['text']
+        assert actual_post['date'] == expected_post['date']
+        assert actual_post['image_id'] == expected_post['image_id']
