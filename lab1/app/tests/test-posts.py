@@ -1,6 +1,6 @@
 import pytest
 from flask import url_for
-from app import app, posts_list
+from root_app.app.app import app, posts_list
 
 
 @pytest.fixture
