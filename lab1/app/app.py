@@ -2,11 +2,17 @@ import random
 from flask import Flask, render_template, abort
 from faker import Faker
 from functools import lru_cache
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 fake = Faker()
 
 app = Flask(__name__)
 application = app
+
+@app.before_request
+def fix_script_name():
+    if 'SCRIPT_NAME' in app.config:
+        app.wsgi_app = DispatcherMiddleware(None, {app.config['SCRIPT_NAME']: app.wsgi_app})
 
 app.config["SERVER_NAME"] = 'vintage150.pythonanywhere.com' 
 app.config['SCRIPT_NAME'] = '/lab1'

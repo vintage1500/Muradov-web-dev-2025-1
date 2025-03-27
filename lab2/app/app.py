@@ -1,8 +1,14 @@
 import re
 from flask import Flask, render_template, request, make_response
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
 app = Flask(__name__)
 application = app
+
+@app.before_request
+def fix_script_name():
+    if 'SCRIPT_NAME' in app.config:
+        app.wsgi_app = DispatcherMiddleware(None, {app.config['SCRIPT_NAME']: app.wsgi_app})
 
 app.config["SERVER_NAME"] = 'vintage150.pythonanywhere.com' 
 app.config['SCRIPT_NAME'] = '/lab2'
