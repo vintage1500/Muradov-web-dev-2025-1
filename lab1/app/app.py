@@ -16,6 +16,7 @@ def fix_script_name():
 
 app.config["SERVER_NAME"] = 'vintage150.pythonanywhere.com' 
 app.config['SCRIPT_NAME'] = '/lab1'
+app.config['APPLICATION_ROOT'] = '/lab1'    
 
 images_ids = ['7d4e9175-95ea-4c5f-8be5-92a6b708bb3c',
               '2d2ab7df-cdbc-48a8-a936-35bba702def5',

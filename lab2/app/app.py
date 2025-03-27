@@ -12,6 +12,7 @@ def fix_script_name():
 
 app.config["SERVER_NAME"] = 'vintage150.pythonanywhere.com' 
 app.config['SCRIPT_NAME'] = '/lab2'
+app.config['APPLICATION_ROOT'] = '/lab2'
 
 @app.route('/')
 def index():
