@@ -1,15 +1,14 @@
 import random
 from flask import Flask, render_template, abort
 from faker import Faker
-from functools import lru_cache
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from functools import lru_cache 
 
 fake = Faker()
 
 app = Flask(__name__)
 application = app
 
-app.config["SERVER_NAME"] = 'vintage150.pythonanywhere.com'  
+# app.config["SERVER_NAME"] = 'vintage150.pythonanywhere.com'  
 
 images_ids = ['7d4e9175-95ea-4c5f-8be5-92a6b708bb3c',
               '2d2ab7df-cdbc-48a8-a936-35bba702def5',

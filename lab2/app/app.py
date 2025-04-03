@@ -1,6 +1,5 @@
 import re
-from flask import Flask, render_template, request, make_response
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from flask import Flask, render_template, request, make_response 
 
 app = Flask(__name__)
 application = app
