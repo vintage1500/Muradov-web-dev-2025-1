@@ -6,7 +6,7 @@ app = Flask(__name__)
 application = app
 
 
-# app.config["SERVER_NAME"] = 'vintage150.pythonanywhere.com'   
+app.config["SERVER_NAME"] = 'vintage150.pythonanywhere.com'   
 # app.secret_key = '8806d05fdb32c6b25bbe417def4258c5e9b4dc4d865aa57a66105ce119d3da2e'
 app.config.from_pyfile('config.py')
 
