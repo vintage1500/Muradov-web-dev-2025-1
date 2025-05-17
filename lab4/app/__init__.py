@@ -17,7 +17,9 @@ def create_app(test_config=None):
         
     from .cli import init_db_command
     app.cli.add_command(init_db_command)
-
-        # from . import 
+   
+    from . import auth
+    app.register_blueprint(auth.bp)
+    auth.login_manager.init_app(app)
     
     return app

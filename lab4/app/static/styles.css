@@ -1,0 +1,17 @@
+body {
+    font-size: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+footer p {
+    padding: 20px;
+    text-align: center;
+    color: white;
+    margin: 0;
+}

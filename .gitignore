@@ -3,3 +3,4 @@ lab1/ve
 */.pytest_cache 
 */__init__.py
 *.py[cod]
+.idea/
