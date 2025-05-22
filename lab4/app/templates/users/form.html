@@ -1,0 +1,89 @@
+{% macro user_form(roles, action, user_data={}, errors={}) %}
+<form method="post" class="needs-validation" novalidate>
+    {% if action == 'new' %}
+    <div class="mb-3">
+        <label for="login" class="form-label">Логин</label>
+        <input type="text" name="username" id="login"
+            class="form-control {% if errors.get('username') %}is-invalid{% endif %}"
+            value="{{ user_data.get('username', '') }}" required minlength="5" pattern="^[A-Za-z0-9]+$"
+            title="Только латинские буквы и цифры">
+        <div class="invalid-feedback">
+            {{ errors.get('username', 'Логин должен содержать минимум 5 латинских букв или цифр') }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Пароль</label>
+        <input type="password" name="password" id="password"
+            class="form-control {% if errors.get('password') %}is-invalid{% endif %}" 
+            {% if action == 'new' %}required{% endif %}
+            required minlength="8"
+            maxlength="128"
+            pattern="^(?=.*[a-zа-яё])(?=.*[A-ZА-ЯЁ])(?=.*\d)[^ ]+$"
+            title="Пароль: 8-128 символов, минимум одна заглавная и строчная буква, цифра, спецсимвол. Без пробелов.">
+        <div class="invalid-feedback">
+            {{ errors.get('password', 'Пароль должен содержать 8-128 символов, включая заглавные и строчные буквы, цифры
+            и спецсимволы') }}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="mb-3">
+        <label for="first_name" class="form-label">Имя</label>
+        <input type="text" name="first_name" id="first_name"
+            class="form-control {% if errors.get('first_name') %}is-invalid{% endif %}"
+            value="{{ user_data.get('first_name', '') }}" required>
+        <div class="invalid-feedback">
+            {{ errors.get('first_name', 'Поле обязательно для заполнения') }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="middle_name" class="form-label">Отчество</label>
+        <input type="text" name="middle_name" id="middle_name" class="form-control"
+            value="{{ user_data.get('middle_name', '') }}">
+    </div>
+
+    <div class="mb-3">
+        <label for="last_name" class="form-label">Фамилия</label>
+        <input type="text" name="last_name" id="last_name"
+            class="form-control {% if errors.get('last_name') %}is-invalid{% endif %}"
+            value="{{ user_data.get('last_name', '') }}" required>
+        <div class="invalid-feedback">
+            {{ errors.get('last_name', 'Поле обязательно для заполнения') }}
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="role_id" class="form-label">Роль</label>
+        <select name="role_id" id="role_id" class="form-select">
+            <option value="">--</option>
+            {% for role in roles %}
+            <option value="{{ role.id }}" {% if role.id | string==user_data.get.role_id | string %}selected{% endif %}>
+                {{ role.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>
+
+<script>
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.forEach.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
+{% endmacro %}

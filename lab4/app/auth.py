@@ -3,7 +3,7 @@ from flask import Blueprint, request, render_template, url_for, flash, redirect
 from flask_login import LoginManager, UserMixin, current_user, login_user, logout_user, login_required
 from .repositories import UserRepository
 from .extension import db
-
+import re
 
 user_repository = UserRepository(db)
 
@@ -39,7 +39,7 @@ def login():
         if user:
             flash('Авторизация прошла успешно', 'success')
             login_user(User(user), remember=remember_me) 
-            return redirect(request.args.get('next', url_for('index')))
+            return redirect(request.args.get('next', url_for('users.index')))
             
         flash('Неверное имя пользователя или пароль', 'danger')
     return render_template('auth/login.html')
@@ -48,3 +48,42 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('users.index'))
+
+@bp.route('/update_password', methods=['GET', 'POST'])
+@login_required
+def update_password():
+    problems = {}
+
+    if request.method == 'POST':
+        current_pwd = request.form.get('old_password')
+        new_pwd = request.form.get('new_password')
+        repeat_pwd = request.form.get('confirm_password')
+
+        account = user_repository.get_by_id(current_user.id)
+
+        # Проверка текущего пароля
+        if not user_repository.check_old_password(account['username'], current_pwd):
+            problems['old_password'] = 'Текущий пароль указан неверно'
+
+        # Проверка сложности нового пароля
+        if not re.fullmatch(r'^(?=.*[a-zа-яё])(?=.*[A-ZА-ЯЁ])(?=.*\d)[^ ]+$', new_pwd or ''):
+            problems['new_password'] = 'Пароль должен содержать строчные и заглавные буквы, цифры и быть без пробелов'
+        elif not (8 <= len(new_pwd) <= 128):
+            problems['new_password'] = 'Длина пароля должна быть от 8 до 128 символов'
+
+        # Проверка совпадения паролей
+        if new_pwd != repeat_pwd:
+            problems['confirm_password'] = 'Введённые пароли не совпадают!'
+
+        # Если всё хорошо — сохраняем
+        if not problems:
+            try:
+                user_repository.update_password(account['id'], new_pwd)
+                flash('Новый пароль сохранён', 'success')
+                return redirect(url_for('users.index'))
+            except Exception:
+                flash('Не удалось изменить пароль. Повторите позже', 'danger')
+        else:
+            return render_template('auth/update_password.html', errors=problems)
+
+    return render_template('auth/update_password.html')

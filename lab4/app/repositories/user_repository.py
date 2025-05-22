@@ -52,3 +52,20 @@ class UserRepository:
         with connection.cursor() as cursor:
             cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
             connection.commit()
+
+    def check_old_password(self, username, password): 
+        with self.db_connector.connect().cursor() as cursor:
+            cursor.execute(
+                "SELECT 1 FROM users WHERE username = %s AND password_hash = SHA2(%s, 256)",
+                (username, password)
+            )
+            return cursor.fetchone() is not None
+    
+    def update_password(self, user_id, new_password): 
+        connection = self.db_connector.connect()
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE users SET password_hash = SHA2(%s, 256) WHERE id = %s",
+                (new_password, user_id)
+            )
+            connection.commit()

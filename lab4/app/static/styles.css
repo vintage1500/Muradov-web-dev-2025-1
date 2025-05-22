@@ -15,3 +15,8 @@ footer p {
     color: white;
     margin: 0;
 }
+
+.btn-primary {
+    background-color: #005eff;
+    border: none;
+}
