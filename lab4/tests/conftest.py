@@ -165,3 +165,8 @@ def logged_in_user(client, existing_users):
             'password': 'password1'
         })
         yield
+
+@pytest.fixture
+def login_existing_user(client, existing_users):
+    with client.session_transaction() as session:
+        session['_user_id'] = str(existing_users[0].id)

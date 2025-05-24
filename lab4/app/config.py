@@ -4,3 +4,8 @@ MYSQL_USER = 'root'
 MYSQL_PASSWORD = '12345678'
 MYSQL_HOST = '127.0.0.1'
 MYSQL_DATABASE = 'flask_user' 
+
+MYSQL_USER = 'vintage150'
+MYSQL_PASSWORD = 'supersecretpassword'
+MYSQL_HOST = 'vintage150.mysql.pythonanywhere-services.com'
+MYSQL_DATABASE = 'vintage150$default'
