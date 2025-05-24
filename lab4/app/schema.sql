@@ -16,7 +16,7 @@ CREATE TABLE users (
     password_hash VARCHAR(256) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     role_id INTEGER,
-    FOREIGN KEY (role_id) REFERENCES roles(id)
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
 ) ENGINE INNODB;
 
 INSERT INTO roles (id, name)

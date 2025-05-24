@@ -155,3 +155,13 @@ def existing_users(db_connector, example_roles):
 @pytest.fixture
 def client(app):
     return app.test_client()
+
+@pytest.fixture
+def logged_in_user(client, existing_users):
+    # Логиним пользователя перед тестами смены пароля
+    with client:
+        client.post('/login', data={
+            'username': existing_users[0].username,
+            'password': 'password1'
+        })
+        yield
