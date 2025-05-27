@@ -1,6 +1,7 @@
 lab1/ve
 */__pycache__/*
-*/.pytest_cache 
+*/.pytest_cache
 */__init__.py
 *.py[cod]
 .idea/
+lab1/app/ve
