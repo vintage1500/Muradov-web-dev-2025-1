@@ -43,4 +43,3 @@ class VisitLog(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
     user = db.relationship('User', back_populates='visit_logs')
- 

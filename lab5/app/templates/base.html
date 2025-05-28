@@ -42,6 +42,15 @@
 							{% endif %}
 						</li>
 						<li class="nav-item">
+							<a class="nav-link" aria-current="page" href="{{ url_for('visits.index') }}">Журнал посещений</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" aria-current="page" href="{{ url_for('visits.report_by_pages') }}">Отчет по страницам</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" aria-current="page" href="{{ url_for('visits.report_by_users') }}">Отчет по пользователям</a>
+						</li>
+						<li class="nav-item">
 							{% if current_user.is_authenticated %}
 							<a class="nav-link active" aria-current="page" href="{{ url_for('auth.logout') }}">Выйти</a>
 							{% else %}

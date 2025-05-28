@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Отчёт: посещения по пользователям</h2>
+    <a class="btn btn-outline-primary mb-3" href="{# url_for('visits.export_users_csv') #}">📥 Экспорт в CSV</a>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Пользователь</th>
+                <th>Количество посещений</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i, name, count in stats %}
+            <tr>
+                <td>{{ i }}</td>
+                <td>{{ name }}</td>
+                <td>{{ count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

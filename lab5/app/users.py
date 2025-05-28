@@ -7,8 +7,32 @@ from .extension import db
 
 user_repository = UserRepository(db)
 role_repository = RoleRepository(db)
+  
 
 bp = Blueprint('users', __name__, url_prefix='/users')
+
+from functools import wraps
+from flask_login import current_user
+
+def check_rights(action):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            role_id = current_user.role_id if current_user.is_authenticated else None
+            print('\n\n\n' + str(role_id) + '\n\n\n')
+            rights = {
+                1: {"create", "edit", "view", "delete", "view_logs_all"},
+                2: {"edit_self", "view_self", "view_logs_own"}
+            }
+
+            allowed_actions = rights.get(role_id, set())
+
+            if action not in allowed_actions:
+                flash("У вас недостаточно прав для доступа к данной странице.", "warning")
+                return redirect(url_for("users.index"))  
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 @bp.errorhandler(connector.errors.DatabaseError)
 def handler():
@@ -16,10 +40,12 @@ def handler():
 
 @bp.route('/')
 def index():
-    return render_template('users/index.html', users=user_repository.all())
+    return render_template('users/index.html', users=user_repository.all()) 
 
 @bp.route('/<int:user_id>')
 def show(user_id):
+    print(type(current_user))  # Должно быть: <class 'app.models.User'> или что-то в этом роде
+    print(current_user.__dict__)
     user = user_repository.get_by_id(user_id)
     if not user:  
         flash('Пользователя нет в базе данных', 'danger')
@@ -35,6 +61,7 @@ def show(user_id):
 
 @bp.route('/new', methods= ['POST', 'GET'])
 @login_required
+@check_rights('create')
 def new():
     user_data = {}
     if request.method == 'POST':
@@ -52,6 +79,7 @@ def new():
 
 @bp.route('/<int:user_id>/edit', methods = ['POST', 'GET'])
 @login_required
+@check_rights('edit')
 def edit(user_id):
     user = user_repository.get_by_id(user_id)
     if user is None:
@@ -75,6 +103,7 @@ def edit(user_id):
 
 @bp.route('/<int:user_id>/delete', methods = ['POST'])
 @login_required
+@check_rights('delete')
 def delete(user_id): 
     user_repository.delete(user_id)
     flash('Учётная запись успешно удалена', 'success')

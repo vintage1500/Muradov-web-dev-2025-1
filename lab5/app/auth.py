@@ -16,9 +16,15 @@ login_manager.login_message_category = 'warning'
 
 class User(UserMixin):
     def __init__(self, user_data): 
-        self.id = user_data.id
+        self.id = user_data.id  
         self.username = user_data.username
-        self.user_data = user_data  
+        self.first_name = user_data.first_name
+        self.last_name = user_data.last_name
+        self.middle_name = user_data.middle_name
+        self.password_hash = user_data.password_hash
+        self.created_at = user_data.created_at
+        self.role_id = user_data.role_id
+        self.role = user_data.role 
         
 @login_manager.user_loader
 def load_user(user_id):
