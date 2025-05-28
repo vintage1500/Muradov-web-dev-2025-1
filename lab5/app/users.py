@@ -26,8 +26,8 @@ def show(user_id):
         return redirect(url_for('users.index'))
     
     user_role = None
-    if user.get('role_id'): 
-        user_role = role_repository.get_by_id(user['role_id'])  
+    if user.role_id:  
+        user_role = role_repository.get_by_id(user.role_id)  
         
     return render_template('users/show.html', 
                          user_data=user,

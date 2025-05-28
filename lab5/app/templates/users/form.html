@@ -32,7 +32,7 @@
         <label for="first_name" class="form-label">Имя</label>
         <input type="text" name="first_name" id="first_name"
             class="form-control {% if errors.get('first_name') %}is-invalid{% endif %}"
-            value="{{ user_data.get('first_name', '') }}" required>
+            value="{{ user_data.first_name or '' }}" required>
         <div class="invalid-feedback">
             {{ errors.get('first_name', 'Поле обязательно для заполнения') }}
         </div>
@@ -41,14 +41,14 @@
     <div class="mb-3">
         <label for="middle_name" class="form-label">Отчество</label>
         <input type="text" name="middle_name" id="middle_name" class="form-control"
-            value="{{ user_data.get('middle_name', '') }}">
+            value="{{ user_data.middle_name or '' }}">
     </div>
 
     <div class="mb-3">
         <label for="last_name" class="form-label">Фамилия</label>
         <input type="text" name="last_name" id="last_name"
             class="form-control {% if errors.get('last_name') %}is-invalid{% endif %}"
-            value="{{ user_data.get('last_name', '') }}" required>
+            value="{{ user_data.last_name or '' }}" required>
         <div class="invalid-feedback">
             {{ errors.get('last_name', 'Поле обязательно для заполнения') }}
         </div>
@@ -59,7 +59,7 @@
         <select name="role_id" id="role_id" class="form-select">
             <option value="">--</option>
             {% for role in roles %}
-            <option value="{{ role.id }}" {% if role.id | string==user_data.get.role_id | string %}selected{% endif %}>
+            <option value="{{ role.id }}" {% if role.id | string==user_data.role_id | string %}selected{% endif %}>
                 {{ role.name }}
             </option>
             {% endfor %}

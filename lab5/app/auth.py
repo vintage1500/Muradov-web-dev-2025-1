@@ -16,8 +16,8 @@ login_manager.login_message_category = 'warning'
 
 class User(UserMixin):
     def __init__(self, user_data): 
-        self.id = user_data['id']
-        self.username = user_data['username']
+        self.id = user_data.id
+        self.username = user_data.username
         self.user_data = user_data  
         
 @login_manager.user_loader
@@ -62,7 +62,7 @@ def update_password():
         account = user_repository.get_by_id(current_user.id)
 
         # Проверка текущего пароля
-        if not user_repository.check_old_password(account['username'], current_pwd):
+        if not user_repository.check_old_password(account.username, current_pwd):
             problems['old_password'] = 'Текущий пароль указан неверно'
 
         # Проверка сложности нового пароля
@@ -78,7 +78,7 @@ def update_password():
         # Если всё хорошо — сохраняем
         if not problems:
             try:
-                user_repository.update_password(account['id'], new_pwd)
+                user_repository.update_password(account.id, new_pwd)
                 flash('Новый пароль сохранён', 'success')
                 return redirect(url_for('users.index'))
             except Exception:

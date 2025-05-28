@@ -3,6 +3,7 @@ import os
 from flask import Flask, session
 from .extension import db
 from flask_migrate import Migrate
+from . import models
 
 
 def create_app(test_config=None):
@@ -27,7 +28,7 @@ def create_app(test_config=None):
 
     from . import users
     app.register_blueprint(users.bp)
-    
+
     app.route('/', endpoint='index')(users.index)
     
     return app
