@@ -1,2 +1,2 @@
-from .db import DBConnector
-db = DBConnector()
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()

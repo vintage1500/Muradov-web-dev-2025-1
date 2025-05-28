@@ -2,6 +2,8 @@ import os
 
 from flask import Flask, session
 from .extension import db
+from flask_migrate import Migrate
+
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=False)
@@ -12,6 +14,7 @@ def create_app(test_config=None):
         app.config.from_mapping(test_config)
 
     db.init_app(app)
+    migrate = Migrate(app, db)
 
     app.extensions['db'] = db
         
@@ -24,6 +27,7 @@ def create_app(test_config=None):
 
     from . import users
     app.register_blueprint(users.bp)
+    
     app.route('/', endpoint='index')(users.index)
     
     return app
