@@ -20,7 +20,7 @@
 			<td>{{ loop.index }}</td>
 			<td>{{ user.last_name }} {{ user.first_name }} {{ user.middle_name or '' }}</td>
 			<td>{{ user.username }}</td>
-			<td>{{ user.role.name or 'Нет роли' }}</td>
+			<td>{{ user.role_name or 'Нет роли' }}</td>
 			<td>
 				<a class="btn btn-primary btn-sm me-1" href="{{ url_for('users.show', user_id=user.id) }}">Смотреть</a>
 				{% if current_user.is_authenticated %}
