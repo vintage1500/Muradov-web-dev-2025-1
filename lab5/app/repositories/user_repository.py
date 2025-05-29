@@ -32,13 +32,16 @@ class UserRepository:
         db.session.commit()
         return user
 
-    def update(self, user_id, first_name, middle_name, last_name, role_id):
+    def update(self, user_id, first_name, middle_name, last_name, role_id=None):
         user = User.query.get(user_id)
         if user:
             user.first_name = first_name
             user.middle_name = middle_name
             user.last_name = last_name
-            user.role_id = role_id
+            if user.role_id == None:
+                pass
+            else:
+                user.role_id = role_id
             db.session.commit()
         return user
 

@@ -1,4 +1,4 @@
-{% macro user_form(roles, action, user_data={}, errors={}) %}
+{% macro user_form(roles, action, role_user_id, user_data={}, errors={}) %}
 <form method="post" class="needs-validation" novalidate>
     {% if action == 'new' %}
     <div class="mb-3">
@@ -53,7 +53,7 @@
             {{ errors.get('last_name', 'Поле обязательно для заполнения') }}
         </div>
     </div>
-
+    {% if role_user_id == 1 %}
     <div class="mb-3">
         <label for="role_id" class="form-label">Роль</label>
         <select name="role_id" id="role_id" class="form-select">
@@ -65,6 +65,7 @@
             {% endfor %}
         </select>
     </div>
+    {% endif %}
 
     <button type="submit" class="btn btn-primary">Сохранить</button>
 </form>

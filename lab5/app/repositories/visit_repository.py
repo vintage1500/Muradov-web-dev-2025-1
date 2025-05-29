@@ -14,6 +14,9 @@ class VisitLogRepository:
     def get_all_paginated(self, page, per_page):
         return VisitLog.query.order_by(VisitLog.created_at.desc()).paginate(page=page, per_page=per_page)
 
+    def get_by_user_paginated(self, user_id, page, per_page):
+        return VisitLog.query.filter_by(user_id=user_id).order_by(VisitLog.created_at.desc()).paginate(page=page, per_page=per_page)
+
     def get_visits_grouped_by_path(self):
         return (
             self.db.session.query(

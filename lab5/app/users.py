@@ -1,7 +1,7 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import login_required
+from flask_login import login_required, current_user
 import mysql.connector as connector
-
+from .decorators import check_rights
 from .repositories import UserRepository, RoleRepository
 from .extension import db
 
@@ -11,28 +11,6 @@ role_repository = RoleRepository(db)
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
-from functools import wraps
-from flask_login import current_user
-
-def check_rights(action):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            role_id = current_user.role_id if current_user.is_authenticated else None
-            print('\n\n\n' + str(role_id) + '\n\n\n')
-            rights = {
-                1: {"create", "edit", "view", "delete", "view_logs_all"},
-                2: {"edit_self", "view_self", "view_logs_own"}
-            }
-
-            allowed_actions = rights.get(role_id, set())
-
-            if action not in allowed_actions:
-                flash("У вас недостаточно прав для доступа к данной странице.", "warning")
-                return redirect(url_for("users.index"))  
-            return func(*args, **kwargs)
-        return wrapper
-    return decorator
 
 @bp.errorhandler(connector.errors.DatabaseError)
 def handler():
@@ -86,9 +64,11 @@ def edit(user_id):
         flash('Пользователя нет в базе данных', 'danger')
         return redirect(url_for('users.index'))
     
-    if request.method == 'POST':
+    if request.method == 'POST': 
         fields = ('first_name', 'middle_name', 'last_name', 'role_id')
         user_data = { field: request.form.get(field) or None for field in fields }
+        if user_data['role_id'] == None:
+            user_data['role_id'] = 2
         user_data['user_id'] = user_id
         try:
             user_repository.update(**user_data)
@@ -99,7 +79,8 @@ def edit(user_id):
             db.connect().rollback()
             user = user_data
     return render_template('users/edit.html', user_data=user, roles=role_repository.get_all())
-            
+                
+
 
 @bp.route('/<int:user_id>/delete', methods = ['POST'])
 @login_required

@@ -22,9 +22,16 @@
 			<td>{{ user.username }}</td>
 			<td>{{ user.role.name or 'Нет роли' }}</td>
 			<td>
+				{% if current_user.role_id == 1 or current_user.id == user.id %}
 				<a class="btn btn-primary btn-sm me-1" href="{{ url_for('users.show', user_id=user.id) }}">Смотреть</a>
+				{% endif %}
 				{% if current_user.is_authenticated and current_user.role_id == 1 %}
-				<a class="btn btn-primary btn-sm me-1" href="{{ url_for('users.edit', user_id=user.id) }}">Изменить</a>
+				<a class="btn btn-primary btn-sm me-1" href="{{ url_for('users.edit', user_id=user.id) }}">Изменить</a> 
+				{% endif %}
+				{% if current_user.is_authenticated and current_user.role_id == 2 and current_user.id == user.id %}
+				<a class="btn btn-primary btn-sm me-1" href="{{ url_for('users.edit', user_id=user.id) }}">Изменить</a> 
+				{% endif %}
+				{% if current_user.is_authenticated and current_user.role_id == 1 %}
 				<button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
 					data-user-id="{{ user.id }}" data-user-name="{{ user.username }}"
 					data-action="{{ url_for('users.delete', user_id=user.id) }}">
