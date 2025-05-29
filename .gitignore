@@ -5,3 +5,4 @@ lab1/ve
 *.py[cod]
 .idea/
 lab1/app/ve
+*/migrations/*
