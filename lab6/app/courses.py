@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, abort
-from flask_login import login_required
+from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError
 
 from app.models import db
-from app.repositories import CourseRepository, UserRepository, CategoryRepository, ImageRepository
+from app.repositories import CourseRepository, UserRepository, CategoryRepository, ImageRepository, ReviewRepository
 
 user_repository = UserRepository(db)
 course_repository = CourseRepository(db)
@@ -78,4 +78,59 @@ def show(course_id):
     course = course_repository.get_course_by_id(course_id)
     if course is None:
         abort(404)
-    return render_template('courses/show.html', course=course)
+    review_repository = ReviewRepository(db)
+    last_reviews = review_repository.get_last_reviews(course_id)
+    user_review = None
+    if current_user.is_authenticated:
+        user_review = review_repository.get_review_by_user_and_course(current_user.id, course_id)
+
+    return render_template('courses/show.html',
+                           course=course,
+                           reviews=last_reviews,
+                           user_review=user_review)
+
+@bp.route('/<int:course_id>/reviews')
+def reviews(course_id):
+    sort = request.args.get('sort', 'newest')
+    page = request.args.get('page', 1, type=int)
+
+    course = course_repository.get_course_by_id(course_id)
+    if course is None:
+        abort(404)
+
+    review_repository = ReviewRepository(db)
+    pagination = review_repository.get_paginated_reviews(course_id, sort=sort, page=page)
+    reviews = pagination.items
+
+    user_review = None
+    if current_user.is_authenticated:
+        user_review = review_repository.get_review_by_user_and_course(current_user.id, course_id)
+
+    return render_template('courses/review.html',
+                           course=course,
+                           reviews=reviews,
+                           pagination=pagination,
+                           sort=sort,
+                           user_review=user_review)
+
+
+@bp.route('/<int:course_id>/reviews', methods=['POST'])
+@login_required
+def create_review(course_id):
+    course = course_repository.get_course_by_id(course_id)
+    if not course:
+        abort(404)
+
+    review_repository = ReviewRepository(db)
+    existing = review_repository.get_review_by_user_and_course(current_user.id, course_id)
+    if existing:
+        flash('Вы уже оставили отзыв на этот курс.', 'warning')
+        return redirect(url_for('courses.show', course_id=course_id))
+
+    rating = request.form.get('rating', type=int)
+    text = request.form.get('text')
+
+    review_repository.add_review(course, current_user.id, rating, text)
+    flash('Ваш отзыв успешно добавлен!', 'success')
+
+    return redirect(url_for('courses.show', course_id=course_id))

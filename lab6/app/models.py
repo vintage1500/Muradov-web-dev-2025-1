@@ -106,3 +106,22 @@ class Image(db.Model):
     @property
     def url(self):
         return url_for('main.image', image_id=self.id)
+
+class Review(Base):
+    __tablename__ = 'reviews'
+    __table_args__ = (
+        sa.UniqueConstraint("course_id", "user_id", name="uq_reviews_course_user"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(default=datetime.now)
+    course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+
+    course: Mapped["Course"] = relationship("Course", backref="reviews")
+    user: Mapped["User"] = relationship("User", backref="reviews")
+
+    def __repr__(self):
+        return f"<Review {self.id} by user {self.user_id} for course {self.course_id}>"
