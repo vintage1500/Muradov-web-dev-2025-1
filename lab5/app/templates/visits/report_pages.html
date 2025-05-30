@@ -3,6 +3,7 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Отчёт по посещениям страниц</h2>
+    <a class="btn btn-outline-primary mb-3" href="{{ url_for('visits.export_report_by_pages') }}">📥 Экспорт в CSV</a>
     <table class="table table-striped mt-3">
         <thead>
             <tr>

@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, request, send_file
+from flask import Blueprint, render_template, request, send_file, Response
 from flask_login import current_user 
 from .repositories.visit_repository import VisitLogRepository
 from .extension import db
 from .decorators import check_rights
-
+import csv
+from io import StringIO
 
 visit_repository = VisitLogRepository(db)
 
@@ -61,6 +62,26 @@ def report_by_pages():
     return render_template('visits/report_pages.html', stats=stats)
 
 
+@bp.route('/report/pages/export')
+@check_rights("view_logs_all")
+def export_report_by_pages():
+    stats_raw = visit_repository.get_visits_grouped_by_path()
+
+    si = StringIO()
+    writer = csv.writer(si, delimiter=';')
+    writer.writerow(['Путь', 'Количество посещений'])
+
+    for row in stats_raw:
+        writer.writerow([row[0], row[1]])
+
+    output = si.getvalue()
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=report_by_pages.csv"}
+    )
+
+
 @bp.route('/report/users')
 @check_rights("view_logs_all")
 def report_by_users():
@@ -76,4 +97,32 @@ def report_by_users():
         formatted_stats.append((i, name, count))
 
     return render_template('visits/report_users.html', stats=formatted_stats)
+
+
+@bp.route('/report/users/export')
+@check_rights("view_logs_all")
+def export_report_by_users():
+    stats = visit_repository.get_visits_grouped_by_user()
+
+    # Подготовка CSV-данных
+    si = StringIO()
+    writer = csv.writer(si, delimiter=';')  # CSV с ; — удобен для Excel в русской локали
+    writer.writerow(['№', 'Пользователь', 'Количество посещений'])
+
+    for i, (user_id, count) in enumerate(stats, start=1):
+        user = visit_repository.get_user_by_id(user_id) if user_id else None
+        try:
+            name = user.last_name + " " + user.first_name + " " + user.middle_name if user else "Неаутентифицированный пользователь"
+        except:
+            name = user.last_name + " " + user.first_name if user else "Неаутентифицированный пользователь"
+        writer.writerow([i, name, count])
+
+    # Отдаем файл как скачиваемый
+    output = si.getvalue()
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=report_by_users.csv"}
+    )
+
  
