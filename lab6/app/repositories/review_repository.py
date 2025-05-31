@@ -1,4 +1,4 @@
-from app.models import Review
+from lab6.app.models import Review
 from sqlalchemy import desc, asc
 
 class ReviewRepository:

@@ -2,8 +2,8 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError
 
-from app.models import db
-from app.repositories import CourseRepository, UserRepository, CategoryRepository, ImageRepository, ReviewRepository
+from lab6.app.models import db
+from lab6.app.repositories import CourseRepository, UserRepository, CategoryRepository, ImageRepository, ReviewRepository
 
 user_repository = UserRepository(db)
 course_repository = CourseRepository(db)
@@ -52,7 +52,7 @@ def new():
 def create():
     f = request.files.get('background_img')
     img = None
-    course = None 
+    course = None
 
     try:
         if f and f.filename:

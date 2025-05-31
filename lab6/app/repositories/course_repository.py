@@ -1,4 +1,4 @@
-from app.models import Course
+from lab6.app.models import Course
 
 class CourseRepository:
     def __init__(self, db):
@@ -21,13 +21,13 @@ class CourseRepository:
 
     def get_all_courses(self, name=None, category_ids=None, pagination=None):
         if pagination is not None:
-            return pagination.items 
-        
+            return pagination.items
+
         return self.db.session.execute(self._all_query(name, category_ids)).scalars()
 
     def get_course_by_id(self, course_id):
         return self.db.session.get(Course, course_id)
-    
+
     def new_course(self):
         return Course()
 
@@ -46,5 +46,5 @@ class CourseRepository:
         except Exception as e:
             self.db.session.rollback()
             raise e  # Пробрасываем любое другое исключение
-        
+
         return course
