@@ -6,7 +6,12 @@
         <div class="m-auto">
             <h1 class="title mb-3 font-weight-bold">{{ course.name }}</h1>
             <p class="mb-3 mx-auto">
-                {{ course.category.name }} | <span>★</span> <span>{{ "%.2f" | format(course.rating) }}</span>
+                {{ course.category.name }} | <span>★</span>
+                {% if reviews|length == 0 %}
+                <span>0</span>
+                {% else %}
+                <span>{{ '%.1f' % ((course.rating_sum / reviews|length * 10)|round / 10) }}</span>
+                {% endif %}
             </p>
             <div class="container">
                 <p class="description w-75 mb-5 mx-auto">
