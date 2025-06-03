@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, send_file, Response
 from flask_login import current_user 
-from .repositories.visit_repository import VisitLogRepository
+from .repositories import VisitLogRepository
 from .extension import db
 from .decorators import check_rights
 import csv

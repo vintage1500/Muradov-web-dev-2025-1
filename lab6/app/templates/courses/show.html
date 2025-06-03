@@ -10,7 +10,7 @@
                 {% if reviews|length == 0 %}
                 <span>0</span>
                 {% else %}
-                <span>{{ '%.1f' % ((course.rating_sum / reviews|length * 10)|round / 10) }}</span>
+                <span>{{ '%.1f' % ((course.rating_sum / reviews|length * 10) / 10) }}</span>
                 {% endif %}
             </p>
             <div class="container">

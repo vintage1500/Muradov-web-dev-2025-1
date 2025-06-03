@@ -4,22 +4,22 @@ import logging
 import pytest
 import mysql.connector
 from app import create_app
-from app.db import DBConnector
-from app.repositories import RoleRepository
-from app.repositories import UserRepository
+from app.extension import db
+from app.repositories import RoleRepository, UserRepository, Visit_repository
+
 
 TEST_DB_CONFIG = {
     'MYSQL_USER': 'root',
     'MYSQL_PASSWORD': '12345678',
     'MYSQL_HOST': 'localhost',
-    'MYSQL_DATABASE': 'lab4_test',
+    'MYSQL_DATABASE': 'lab5_test',
 }
 
 def get_connection(app):
     return mysql.connector.connect(
         user=app.config['MYSQL_USER'],
         password=app.config['MYSQL_PASSWORD'],
-        host=app.config['MYSQL_HOST']
+        host=app.config['MYSQL_HOST']   
     )
 
 def setup_db(app):
@@ -68,7 +68,7 @@ def app():
 def db_connector(app):
     setup_db(app)
     with app.app_context():
-        connector = DBConnector(app)
+        connector = db(app)
         yield connector
         connector.disconnect()
     teardown_db(app)
@@ -79,6 +79,10 @@ def role_repository(db_connector):
 
 @pytest.fixture
 def user_repository(db_connector):
+    return UserRepository(db_connector)
+
+@pytest.fixture
+def visit_repository(db_connector):
     return UserRepository(db_connector)
 
 @pytest.fixture
