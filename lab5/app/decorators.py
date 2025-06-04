@@ -10,7 +10,7 @@ def check_rights(action):
             print('\n\n\n' + str(role_id) + '\n\n\n')
             rights = {
                 1: {"create", "edit", "view", "delete", "view_logs_all"},
-                2: {"edit", "view_self", "view_logs_own"}
+                2: {"edit_self", "view_self", "view_logs_own"}
             }
 
             allowed_actions = rights.get(role_id, set())

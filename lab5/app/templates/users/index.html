@@ -26,10 +26,11 @@
 				<a class="btn btn-primary btn-sm me-1" href="{{ url_for('users.show', user_id=user.id) }}">Смотреть</a>
 				{% endif %}
 				{% if current_user.is_authenticated and current_user.role_id == 1 %}
-				<a class="btn btn-primary btn-sm me-1" href="{{ url_for('users.edit', user_id=user.id) }}">Изменить</a> 
+				<a class="btn btn-primary btn-sm me-1" href="{{ url_for('users.edit', user_id=user.id) }}">Изменить</a>
 				{% endif %}
 				{% if current_user.is_authenticated and current_user.role_id == 2 and current_user.id == user.id %}
-				<a class="btn btn-primary btn-sm me-1" href="{{ url_for('users.edit', user_id=user.id) }}">Изменить</a> 
+				<a class="btn btn-primary btn-sm me-1"
+					href="{{ url_for('users.edit_self', user_id=user.id) }}">Изменить</a>
 				{% endif %}
 				{% if current_user.is_authenticated and current_user.role_id == 1 %}
 				<button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
@@ -48,7 +49,7 @@
 	</tbody>
 </table>
 {% if current_user.role_id == 1 %}
-	<a class="btn btn-primary btn-sm" href="{{ url_for('users.new') }}">Добавить нового пользователя</a>
+<a class="btn btn-primary btn-sm" href="{{ url_for('users.new') }}">Добавить нового пользователя</a>
 {% endif %}
 
 <!-- Модальное окно -->

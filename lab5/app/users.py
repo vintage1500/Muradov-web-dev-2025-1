@@ -81,6 +81,38 @@ def edit(user_id):
     return render_template('users/edit.html', user_data=user, roles=role_repository.get_all())
                 
 
+@bp.route('/<int:user_id>/edit_self', methods=['POST', 'GET'])
+@login_required
+@check_rights('edit_self')
+def edit_self(user_id):
+    if current_user.id != user_id:
+        flash("Вы можете редактировать только свою учетную запись.", "danger")
+        return redirect(url_for('users.index'))
+
+    user = user_repository.get_by_id(user_id)
+    if user is None:
+        flash('Пользователя нет в базе данных', 'danger')
+        return redirect(url_for('users.index'))
+
+    if request.method == 'POST':
+        fields = ('first_name', 'middle_name', 'last_name', 'role_id')
+        user_data = {field: request.form.get(field) or None for field in fields}
+        if user_data['role_id'] == None:
+            user_data['role_id'] = 2
+        user_data['user_id'] = user_id
+        user_data['user_id'] = user_id
+
+        try:
+            user_repository.update(**user_data)
+            flash('Учетная запись успешно изменена', 'success')
+            return redirect(url_for('users.index'))
+        except connector.errors.DatabaseError:
+            flash('Произошла ошибка при изменении записи', 'danger')
+            db.connect().rollback()
+            user = user_data
+
+    return render_template('users/edit.html', user_data=user, roles=role_repository.get_all())
+
 
 @bp.route('/<int:user_id>/delete', methods = ['POST'])
 @login_required
