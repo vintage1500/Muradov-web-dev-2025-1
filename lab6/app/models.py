@@ -68,7 +68,7 @@ class Course(Base):
     rating_num: Mapped[int] = mapped_column(default=0)
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
     author_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    background_image_id: Mapped[str] = mapped_column(ForeignKey("images.id"))
+    background_image_id: Mapped[str] = mapped_column(ForeignKey("images.id"), default="f1a4ace0-645b-424d-8985-678ac3db897c")
     created_at: Mapped[datetime] = mapped_column(default=datetime.now)
 
     author: Mapped["User"] = relationship()
