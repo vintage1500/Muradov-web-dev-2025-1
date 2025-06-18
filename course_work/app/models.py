@@ -64,8 +64,8 @@ class Product(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    guitar_details = db.relationship('GuitarDetail', backref='product', uselist=False)
-    accessory_details = db.relationship('AccessoryDetail', backref='product', uselist=False)
+    guitar_details = db.relationship('GuitarDetail', back_populates='product', uselist=False)
+    accessory_details = db.relationship('AccessoryDetail', back_populates='product', uselist=False)
     order_items = db.relationship('OrderItem', backref='product', lazy=True)
     ratings = db.relationship('Rating', backref='product', lazy=True)
 
@@ -83,6 +83,8 @@ class GuitarDetail(db.Model):
     neck_material = db.Column(db.String(100), nullable=False)
     pickups = db.Column(db.String(255))
 
+    product = db.relationship('Product', back_populates='guitar_details')
+
     def __repr__(self):
         return f'<GuitarDetail for Product {self.product_id}>'
 
@@ -93,9 +95,9 @@ class AccessoryDetail(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('Products.id', ondelete='CASCADE'), primary_key=True)
     compatibility = db.Column(db.String(255))
     material = db.Column(db.String(100), nullable=False)
-    color = db.Column(db.String(50), nullable=False)
+    color = db.Column(db.String(50), nullable=False)    
 
-    product = db.relationship('Product', backref=db.backref('accessory_detail', uselist=False))
+    product = db.relationship('Product', back_populates='accessory_details')
 
     def __repr__(self):
         return f'<AccessoryDetail for Product {self.product_id}>'

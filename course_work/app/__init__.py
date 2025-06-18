@@ -5,7 +5,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from .extension import db
 from . import models
 from app.auth import bp as auth_bp, init_login_manager
-
+from app.routes import bp as main_bp
+from app.catalogs import bp as catalog_bp
 
 def handle_sqlalchemy_error(err):
     error_msg = ('Возникла ошибка при подключении к базе данных. '
@@ -24,7 +25,9 @@ def create_app(test_config=None):
        
     init_login_manager(app)
 
+    app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(catalog_bp)
     app.errorhandler(SQLAlchemyError)(handle_sqlalchemy_error)
    
     return app

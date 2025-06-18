@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Каталог{% endblock %}
+
+{% block content %}
+<div class="container-catalog">
+    <aside class="filters">
+        <h3>Фильтры</h3>
+        <label>Цена</label>
+        <input type="text" placeholder="От">
+        <input type="text" placeholder="До">
+
+        <label>Тип</label>
+        {% for category in categories %}
+        <label><input type="checkbox"> {{ category.name }} </label>
+        {% endfor %}
+
+        <label>Бренд</label>
+        {% for brand in brands %}
+        <label><input type="checkbox"> {{ brand.name }}</label>
+        {% endfor %}
+    </aside>
+
+    <main class="catalog">
+        <h1>Каталог гитар</h1>
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card">
+                <img src="{{ product.image_url or '/static/default.jpg' }}" alt="{{ product.name }}">
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.category.name }}</p>
+                <p><strong>{{ product.price }} ₽</strong></p>
+                <button class="add-btn">+</button>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        <div class="pagination">
+            {% if pagination.has_prev %}
+            <a href="{{ url_for('catalog.catalog', page=pagination.prev_num) }}">&laquo; Назад</a>
+            {% endif %}
+
+            {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+            {% if p %}
+            {% if p == pagination.page %}
+            <span class="current">{{ p }}</span>
+            {% else %}
+            <a href="{{ url_for('catalog.catalog', page=p) }}">{{ p }}</a>
+            {% endif %}
+            {% else %}
+            <span>...</span>
+            {% endif %}
+            {% endfor %}
+
+            {% if pagination.has_next %}
+            <a href="{{ url_for('catalog.catalog', page=pagination.next_num) }}">Вперёд &raquo;</a>
+            {% endif %}
+        </div>
+
+    </main>
+</div>
+{% endblock %}

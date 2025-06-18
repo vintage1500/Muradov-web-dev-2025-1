@@ -6,6 +6,7 @@
     <title>{% block title %}Kursa Web{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='catalog.css') }}">
 </head>
 
 <body id="body">
@@ -16,31 +17,41 @@
                 <a href="/" class="site-title">Kursa Web</a>
                 <nav class="main-nav">
                     <a href="/">Главная</a>
-                    <a href="/catalog">Каталог</a>
+                    <a href="{{ url_for('catalog.catalog') }}">Каталог</a>
                     <a href="#footer">Контакты</a>
                 </nav>
             </div>
 
             <!-- Центрированный поиск -->
             <form class="search-form">
-                <input type="text" class="search-input" placeholder="Поиск" disabled>
+                <input type="text" class="search-input" placeholder="Поиск">
             </form>
 
             <nav class="nav-links">
-                <a href="{{ url_for('auth.register') }}" class="btn-outline">Регистрация</a>
-                <a href="{{ url_for('auth.login') }}" class="btn-filled">Вход</a>
+                {% if current_user.is_authenticated %}
+                <a href="{# url_for('cart.view_cart') #}" class="btn">Корзина</a>
+                <a href="{# url_for('user.profile') #}" class="btn">Кабинет</a>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-outline">Войти</a>
+                <a href="{{ url_for('auth.register') }}" class="btn-filled">Зарегистрироваться</a>
+                {% endif %}
             </nav>
         </div>
+        {% block header %}
+
+        {% endblock %}
     </header>
-
+ 
+    {% block content %}
     <main class="container" id="main">
-        {% block content %}{% endblock %}
     </main>
+    {% endblock %}
 
+    {% block footer %}
     <footer id="footer" class="footer">
         &copy; 2025 Kursa Web
     </footer>
-
+    {% endblock %}
 </body>
 
 </html>
