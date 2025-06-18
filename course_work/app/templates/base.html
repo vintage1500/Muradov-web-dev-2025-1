@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Kursa Web{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body id="body">
+
+    <header class="header">
+        <div class="container header-content">
+            <div class="left-links">
+                <a href="/" class="site-title">Kursa Web</a>
+                <nav class="main-nav">
+                    <a href="/">Главная</a>
+                    <a href="/catalog">Каталог</a>
+                    <a href="#footer">Контакты</a>
+                </nav>
+            </div>
+
+            <!-- Центрированный поиск -->
+            <form class="search-form">
+                <input type="text" class="search-input" placeholder="Поиск" disabled>
+            </form>
+
+            <nav class="nav-links">
+                <a href="{{ url_for('auth.register') }}" class="btn-outline">Регистрация</a>
+                <a href="{{ url_for('auth.login') }}" class="btn-filled">Вход</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" id="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer id="footer" class="footer">
+        &copy; 2025 Kursa Web
+    </footer>
+
+</body>
+
+</html>
