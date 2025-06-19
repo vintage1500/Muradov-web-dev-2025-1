@@ -147,3 +147,14 @@ def edit_product(product_id):
                            product=product,
                            categories=categories,
                            brands=brands)
+
+@bp.route('/admin/products/<int:product_id>/delete', methods=['POST'])
+def delete_product(product_id):
+    product = admin_repo.get_product_by_id(product_id)
+    if not product:
+        flash("Товар не найден", "danger")
+        return redirect(url_for("admin.products"))
+
+    admin_repo.delete_product(product)
+    flash("Товар успешно удалён", "success")
+    return redirect(url_for("admin.products"))

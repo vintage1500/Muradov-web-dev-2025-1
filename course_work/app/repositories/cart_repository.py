@@ -29,15 +29,18 @@ class CartRepository:
         delivery_fee = self.calculate_delivery_fee(total_price, delivery_date)
         total_with_delivery = total_price + delivery_fee
 
+        any_out_of_stock = any(item.product.stock_quantity == 0 for item in cart_items)
+
         order = Order(
             user_id=user_id,
-            status='pending',
+            status='waiting_for_stock' if any_out_of_stock else 'pending',
             type='regular',
             total_price=total_with_delivery,
             expected_delivery_date=delivery_date,
             created_at=datetime.utcnow(),
             updated_at=datetime.utcnow(),
         )
+
         self.db.session.add(order)
         self.db.session.flush()
 

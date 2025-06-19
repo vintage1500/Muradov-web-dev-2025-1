@@ -513,6 +513,17 @@ a:hover {
     font-size: 0.9rem;
 }
 
+.logout-btn {
+    display: inline-block;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+.logout-btn:hover {
+    color: #c0392b;
+}
+
+
 @media (max-width: 600px) {
     .form-row {
         flex-direction: column;

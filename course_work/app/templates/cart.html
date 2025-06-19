@@ -28,6 +28,9 @@
                     <td class="prod-info">
                         <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
                         <div>{{ item.product.name }}</div>
+                        {% if item.product.stock_quantity == 0 %}
+                        <span class="awaiting-stock">❗ Ожидается поставка
+                            {% endif %}
                     </td>
                     <td>
                         <form method="post" action="{{ url_for('cart.update_quantity', item_id=item.id) }}"
@@ -37,6 +40,7 @@
                             <button type="submit" name="action" value="increase">+</button>
                         </form>
                     </td>
+
                     <td>{{ item.product.price }} ₽</td>
                     <td>{{ (item.product.price * item.quantity) }} ₽</td>
                     <td><a href="{{ url_for('cart.remove', item_id=item.id) }}" class="remove-btn">×</a></td>
@@ -46,7 +50,7 @@
         </table>
         <div class="cart-summary">
             <div><strong>Итого:</strong> {{ total_sum }} ₽</div>
-            <button onclick="openModal()" class="checkout-btn">Оформить заказ</button>
+            <button onclick="openModal()" class="btn-outline">Оформить заказ</button>
         </div>
         {% else %}
         <p>Ваша корзина пуста.</p>

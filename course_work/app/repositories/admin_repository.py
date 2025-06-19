@@ -89,6 +89,9 @@ class AdminRepository:
         self.db.session.commit()
         return product
 
+    def delete_product(self, product):
+        self.db.session.delete(product)
+        self.db.session.commit()
 
     # -------- Orders --------
 

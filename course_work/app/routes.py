@@ -1,12 +1,10 @@
 from flask import Blueprint, render_template, send_from_directory, current_app, abort
 from app.repositories import user_repository
-from app.models import db
+from app.models import db 
+from app.repositories.route_repository import RouteRepository 
  
 bp = Blueprint('main', __name__)
 
-from flask import render_template
-from app.repositories.route_repository import RouteRepository
-from app.extension import db
 
 repo = RouteRepository(db)
 

@@ -30,8 +30,9 @@
                 <td>{{ product.brand.name }}</td>
                 <td>
                     <a href="{{ url_for('admin.edit_product', product_id=product.id) }}" class="btn-outline">✏️</a>
-                    <a href="{# url_for('admin.delete_product', product_id=product.id) #}" class="btn-outline"
-                        onclick="return confirm('Удалить товар?');">🗑️</a>
+                    <form method="POST" action="{{ url_for('admin.delete_product', product_id=product.id) }}" class="sheet">
+                        <button type="submit" onclick="return confirm('Удалить?')" class="icon-btn">🗑️</button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}

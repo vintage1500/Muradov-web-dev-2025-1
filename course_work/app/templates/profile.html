@@ -11,6 +11,7 @@
             <div class="user-info">
                 <h2>{{ user.first_name }} {{ user.last_name }}</h2>
                 <p class="email">{{ user.login }}</p>
+                <a href="{{ url_for('auth.logout') }}" class="logout-btn">Выйти</a>
             </div>
         </div>
 

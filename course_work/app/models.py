@@ -67,8 +67,22 @@ class Product(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     sku = db.Column(db.String(50), unique=True)
 
-    guitar_details = db.relationship('GuitarDetail', back_populates='product', uselist=False)
-    accessory_details = db.relationship('AccessoryDetail', back_populates='product', uselist=False)
+    guitar_details = db.relationship(
+        'GuitarDetail',
+        back_populates='product',
+        uselist=False,
+        cascade='all, delete-orphan',
+        passive_deletes=True
+    )
+
+    accessory_details = db.relationship(
+        'AccessoryDetail',
+        back_populates='product',
+        uselist=False,
+        cascade='all, delete-orphan',
+        passive_deletes=True
+    )
+
     order_items = db.relationship('OrderItem', backref='product', lazy=True) 
 
     cart_items = db.relationship('CartItem', back_populates='product')
@@ -80,14 +94,21 @@ class Product(db.Model):
 class GuitarDetail(db.Model):
     __tablename__ = 'guitardetails'
 
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id', ondelete='CASCADE'), primary_key=True)
+    # product_id = db.Column(db.Integer, db.ForeignKey('products.id', ondelete='CASCADE'), primary_key=True)
     type = db.Column(db.String(100), nullable=False)
     strings_number = db.Column(db.Integer, nullable=False)
     body_material = db.Column(db.String(100), nullable=False)
     neck_material = db.Column(db.String(100), nullable=False)
     pickups = db.Column(db.String(255))
 
+    product_id = db.Column(
+        db.Integer,
+        db.ForeignKey('products.id', ondelete='CASCADE'),
+        primary_key=True
+    )
+
     product = db.relationship('Product', back_populates='guitar_details')
+
 
     def __repr__(self):
         return f'<GuitarDetail for Product {self.product_id}>'
@@ -96,12 +117,20 @@ class GuitarDetail(db.Model):
 class AccessoryDetail(db.Model):
     __tablename__ = 'accessorydetails'
 
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id', ondelete='CASCADE'), primary_key=True)
+    # product_id = db.Column(db.Integer, db.ForeignKey('products.id', ondelete='CASCADE'), primary_key=True)
     compatibility = db.Column(db.String(255))
     material = db.Column(db.String(100), nullable=False)
     color = db.Column(db.String(50), nullable=False)    
 
+    product_id = db.Column(
+        db.Integer,
+        db.ForeignKey('products.id', ondelete='CASCADE'),
+        primary_key=True
+    )
+
     product = db.relationship('Product', back_populates='accessory_details')
+
+    # product = db.relationship('Product', back_populates='accessory_details')
 
     def __repr__(self):
         return f'<AccessoryDetail for Product {self.product_id}>'
