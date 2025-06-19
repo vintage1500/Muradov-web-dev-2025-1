@@ -8,7 +8,7 @@
     <div class="hero-content">
         <h1>Лучшие гитары для <br>вашей музыки</h1>
         <p>Профессиональные инструменты для музыкантов любого <br>уровня. Широкий выбор, гарантия и качество.</p>
-        <a href="#" class="btn-filled">В каталог</a>
+        <a href="{{ url_for('catalog.catalog') }}" class="btn-filled">В каталог</a>
     </div>
 </section>
 {% endblock %}
@@ -31,7 +31,7 @@
             {% endfor %}
         </div>
     </section>
-    
+
     <section class="container text-center section-spacing">
         <h2>Наши преимущества</h2>
         <div class="form-row">

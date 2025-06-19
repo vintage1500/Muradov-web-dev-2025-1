@@ -24,9 +24,11 @@
             </div>
 
             <!-- Центрированный поиск -->
-            <form class="search-form">
-                <input type="text" class="search-input" placeholder="Поиск">
+            <form method="get" action="{{ url_for('catalog.catalog') }}" class="search-form">
+                <input type="text" name="q" class="search-input" placeholder="Поиск"
+                    value="{{ request.args.get('q', '') }}">
             </form>
+
 
             <nav class="nav-links">
                 {% if current_user.is_authenticated %}
