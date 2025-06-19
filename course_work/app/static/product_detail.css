@@ -53,6 +53,11 @@
   margin-bottom: 1rem;
 }
 
+.not-stock {
+  color: red;
+  margin-bottom: 1rem;
+}
+
 .features {
   list-style: none;
   padding: 0;
@@ -105,3 +110,4 @@
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
+

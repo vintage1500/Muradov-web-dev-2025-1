@@ -15,11 +15,14 @@
 
         <div class="product-info">
             <h2>{{ product.name }}</h2>
-            <p class="sku">Артикул: {{ 'FEN-ST-000' ~ product.id }}</p>
+            <p class="sku">Артикул: {{ product.sku }}</p>
 
             <p class="price">{{ product.price }} ₽</p>
-            <p class="in-stock">{% if product.stock_quantity > 0 %}В наличии{% else %}Нет в наличии{% endif %}</p>
-
+            {% if product.stock_quantity > 0 %}
+            <p class="in-stock">В наличии</p>
+            {% else %}
+            <p class="not-stock">Нет в наличии</p>
+            {% endif %}
             <h4>Основные характеристики:</h4>
 
             {% if product.guitar_details %}

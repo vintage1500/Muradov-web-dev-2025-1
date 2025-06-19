@@ -9,6 +9,7 @@ from app.routes import bp as main_bp
 from app.catalogs import bp as catalog_bp
 from app.cart import bp as cart_bp
 from app.profile import bp as profile_bp
+from app.admin import bp as admin_bp
 
 
 def handle_sqlalchemy_error(err):
@@ -33,6 +34,7 @@ def create_app(test_config=None):
     app.register_blueprint(catalog_bp)
     app.register_blueprint(cart_bp)
     app.register_blueprint(profile_bp)
+    app.register_blueprint(admin_bp)
     app.errorhandler(SQLAlchemyError)(handle_sqlalchemy_error)
    
     return app

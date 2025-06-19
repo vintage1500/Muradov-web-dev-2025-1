@@ -8,7 +8,7 @@ from .extension import db
 
 
 class User(db.Model, UserMixin):
-    __tablename__ ='Users'
+    __tablename__ ='users'
 
     id = db.Column(db.Integer, primary_key=True)
     login = db.Column(db.String(100), unique=True, nullable=False) 
@@ -20,6 +20,7 @@ class User(db.Model, UserMixin):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     cart_items = db.relationship('CartItem', back_populates='user', cascade='all, delete-orphan')
+    orders = db.relationship('Order', back_populates='user')
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -29,7 +30,7 @@ class User(db.Model, UserMixin):
 
 
 class Brand(db.Model):
-    __tablename__ = 'Brands'
+    __tablename__ = 'brands'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
@@ -41,7 +42,7 @@ class Brand(db.Model):
 
 
 class Category(db.Model):
-    __tablename__ = 'Categories'
+    __tablename__ = 'categories'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
@@ -53,33 +54,33 @@ class Category(db.Model):
 
 
 class Product(db.Model):
-    __tablename__ = 'Products'
+    __tablename__ = 'products'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     stock_quantity = db.Column(db.Integer, default=0)
-    category_id = db.Column(db.Integer, db.ForeignKey('Categories.id'))
-    brand_id = db.Column(db.Integer, db.ForeignKey('Brands.id'))
-    image_url = db.Column(db.String(255))
-    is_active = db.Column(db.Boolean, default=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+    brand_id = db.Column(db.Integer, db.ForeignKey('brands.id'))
+    image_url = db.Column(db.String(255)) 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    sku = db.Column(db.String(50), unique=True)
 
     guitar_details = db.relationship('GuitarDetail', back_populates='product', uselist=False)
     accessory_details = db.relationship('AccessoryDetail', back_populates='product', uselist=False)
-    order_items = db.relationship('OrderItem', backref='product', lazy=True)
-    ratings = db.relationship('Rating', backref='product', lazy=True)
+    order_items = db.relationship('OrderItem', backref='product', lazy=True) 
 
     cart_items = db.relationship('CartItem', back_populates='product')
+
     def __repr__(self):
         return f'<Product {self.name}>'
 
 
 class GuitarDetail(db.Model):
-    __tablename__ = 'GuitarDetails'
+    __tablename__ = 'guitardetails'
 
-    product_id = db.Column(db.Integer, db.ForeignKey('Products.id', ondelete='CASCADE'), primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id', ondelete='CASCADE'), primary_key=True)
     type = db.Column(db.String(100), nullable=False)
     strings_number = db.Column(db.Integer, nullable=False)
     body_material = db.Column(db.String(100), nullable=False)
@@ -93,9 +94,9 @@ class GuitarDetail(db.Model):
 
 
 class AccessoryDetail(db.Model):
-    __tablename__ = 'AccessoryDetails'
+    __tablename__ = 'accessorydetails'
 
-    product_id = db.Column(db.Integer, db.ForeignKey('Products.id', ondelete='CASCADE'), primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id', ondelete='CASCADE'), primary_key=True)
     compatibility = db.Column(db.String(255))
     material = db.Column(db.String(100), nullable=False)
     color = db.Column(db.String(50), nullable=False)    
@@ -107,17 +108,18 @@ class AccessoryDetail(db.Model):
 
 
 class Order(db.Model):
-    __tablename__ = 'Orders'
+    __tablename__ = 'orders'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
-    status = db.Column(db.Enum('pending', 'paid', 'shipped', 'cancelled', 'waiting_for_stock', name='order_status'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    status = db.Column(db.Enum('pending', 'shipped', 'cancelled', 'waiting_for_stock', name='order_status'), nullable=False)
     total_price = db.Column(db.Numeric(10, 2))
     type = db.Column(db.Enum('regular', 'preorder', name='order_type'), nullable=False)
     expected_delivery_date = db.Column(db.Date)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    user = db.relationship('User', back_populates='orders')
     items = db.relationship('OrderItem', backref='order', lazy=True)
 
     def __repr__(self):
@@ -125,43 +127,24 @@ class Order(db.Model):
 
 
 class OrderItem(db.Model):
-    __tablename__ = 'OrderItems'
+    __tablename__ = 'orderitems'
 
     id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('Orders.id', ondelete='CASCADE'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('Products.id'), nullable=False)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='CASCADE'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)
 
     def __repr__(self):
         return f'<OrderItem {self.id}>'
-
-
-class Rating(db.Model):
-    __tablename__ = 'Ratings'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('Products.id'), nullable=False)
-    stars = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    __table_args__ = (
-        db.UniqueConstraint('user_id', 'product_id', name='unique_rating'),
-    )
-
-    def __repr__(self):
-        return f'<Rating {self.stars} stars by User {self.user_id} for Product {self.product_id}>'
-     
+    
 
 class CartItem(db.Model):
     __tablename__ = 'cart_items'
 
     id = db.Column(db.Integer, primary_key=True)
-    
-    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('Products.id'), nullable=False)
-    
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=1)
 
     user = db.relationship('User', back_populates='cart_items')

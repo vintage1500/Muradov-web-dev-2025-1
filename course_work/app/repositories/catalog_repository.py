@@ -23,5 +23,8 @@ class CatalogRepository:
         if filters.get("max_price") is not None:
             query = query.filter(Product.price <= filters["max_price"])
 
+        if filters.get("available"):
+            query = query.filter(Product.stock_quantity > 0)
+
         pagination = query.paginate(page=page, per_page=per_page)
         return pagination

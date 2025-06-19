@@ -201,6 +201,12 @@ body {
     color: white;
 }
 
+.not-available-price {
+  color: #888;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
 @media (max-width: 768px) {
     .container-catalog {
         flex-direction: column;

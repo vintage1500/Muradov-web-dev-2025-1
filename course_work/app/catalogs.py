@@ -23,6 +23,7 @@ def catalog():
         "brand_ids": request.args.getlist("brand", type=int),
         "min_price": request.args.get("min_price", type=float),
         "max_price": request.args.get("max_price", type=float),
+        "available": request.args.get("available", type=int)
     }
 
     pagination = catalog_repo.get_filtered_products(page, per_page, filters)
@@ -36,8 +37,9 @@ def catalog():
                            pagination=pagination,
                            categories=categories,
                            brands=brands,
-                           selected_categories=filters["category_ids"],
-                           selected_brands=filters["brand_ids"],
+                           selected_categories=[str(cid) for cid in filters["category_ids"]],
+                           selected_brands=[str(bid) for bid in filters["brand_ids"]],
                            min_price=filters["min_price"],
                            max_price=filters["max_price"],
-                           query=filters["query"])
+                           query=filters["query"],
+                           available=filters["available"])

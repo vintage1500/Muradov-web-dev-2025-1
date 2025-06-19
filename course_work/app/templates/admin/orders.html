@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Заказы — Админка{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="container" id="main">
+    <h1>Заказы</h1>
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Пользователь</th>
+                <th>Сумма</th>
+                <th>Тип</th>
+                <th>Статус</th>
+                <th>Обновить</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                <td>{{ order.total_price }} ₽</td>
+                <td>{{ order.type }}</td>
+                <td>{{ order.status }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('admin.update_order_status', order_id=order.id) }}">
+                        <select name="status">
+                            {% for value in ['pending', 'shipped', 'cancelled', 'waiting_for_stock'] %}
+                                <option value="{{ value }}" {% if value == order.status %}selected{% endif %}>{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn-outline">✔</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</main>
+{% endblock %}

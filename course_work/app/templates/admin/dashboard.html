@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Админ-панель{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="container" id="main">
+    <h1 class="text-center">Админ-панель</h1>
+
+    <div class="form-row" style="justify-content: center">
+        <a href="{{ url_for('admin.products') }}" class="btn-filled">Управление товарами</a>
+        <a href="{{ url_for('admin.users') }}" class="btn-filled">Пользователи</a>
+        <a href="{{ url_for('admin.orders') }}" class="btn-filled">Заказы</a>
+    </div>
+
+    <section class="section-spacing">
+        <h2>Последние заказы</h2>
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Пользователь</th>
+                    <th>Дата</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                    <td>{{ order.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ order.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</main>
+{% endblock %}

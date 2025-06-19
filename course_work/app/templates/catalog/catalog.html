@@ -32,7 +32,11 @@
                 {{ brand.name }}
             </label>
             {% endfor %}
-
+            <label><b>_______</b></label>
+            <label>
+                <input type="checkbox" name="available" value="1" {% if available %}checked{% endif %}>
+                Только в наличии
+            </label>
             <button type="submit">Применить</button>
         </form>
     </aside>
@@ -49,7 +53,11 @@
                         <img src="{{ product.image_url or '/static/default.jpg' }}" alt="{{ product.name }}">
                         <h3>{{ product.name }}</h3>
                         <p>{{ product.category.name }}</p>
+                        {% if product.stock_quantity > 0 %}
                         <p><strong>{{ product.price }} ₽</strong></p>
+                        {% else %}
+                        <p class="not-available-price">Нет в наличии</p>
+                        {% endif %}
                     </div>
                 </a>
 
@@ -69,7 +77,8 @@
                     category=selected_categories, 
                     brand=selected_brands,
                     min_price=min_price,
-                    max_price=max_price) }}">
+                    max_price=max_price,
+                    available=available) }}">
                 Назад
             </a>
             {% endif %}
@@ -83,7 +92,8 @@
                     category=selected_categories, 
                     brand=selected_brands,
                     min_price=min_price,
-                    max_price=max_price) }}">
+                    max_price=max_price,
+                    available=available) }}">
                 {{ p }}
             </a>
 
@@ -98,7 +108,8 @@
                     category=selected_categories, 
                     brand=selected_brands,
                     min_price=min_price,
-                    max_price=max_price) }}">
+                    max_price=max_price,
+                    available=available) }}">
                 Вперед
             </a>
             {% endif %}
