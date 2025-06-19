@@ -15,9 +15,9 @@
     <header class="header">
         <div class="container header-content">
             <div class="left-links">
-                <a href="/" class="site-title">Kursa Web</a>
+                <a href="{{ url_for('main.index') }}" class="site-title">Kursa Web</a>
                 <nav class="main-nav">
-                    <a href="/">Главная</a>
+                    <a href="{{ url_for('main.index') }}">Главная</a>
                     <a href="{{ url_for('catalog.catalog') }}">Каталог</a>
                     <a href="#footer">Контакты</a>
                 </nav>
