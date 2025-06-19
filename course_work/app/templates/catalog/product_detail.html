@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block head%}
+<link rel="stylesheet" href="{{ url_for('static', filename='product_detail.css') }}">
+{% endblock %}
+
+{% block content %}
+<main class="container product-detail-page">
+    <div class="product-card">
+        <div class="product-image">
+            <img src="{{ product.image_url }}" alt="{{ product.name }}">
+        </div>
+
+        <div class="product-info">
+            <h2>{{ product.name }}</h2>
+            <p class="sku">Артикул: {{ 'FEN-ST-000' ~ product.id }}</p>
+
+            <p class="price">{{ product.price }} ₽</p>
+            <p class="in-stock">{% if product.stock_quantity > 0 %}В наличии{% else %}Нет в наличии{% endif %}</p>
+
+            <h4>Основные характеристики:</h4>
+
+            {% if product.guitar_details %}
+            <ul class="features">
+                <li>Тип: {{ product.guitar_details.type }}</li>
+                <li>Количество струн: {{ product.guitar_details.strings_number }}</li>
+                <li>Материал корпуса: {{ product.guitar_details.body_material }}</li>
+                <li>Материал грифа: {{ product.guitar_details.neck_material }}</li>
+                <li>Звукосниматели: {{ product.guitar_details.pickups or 'Нет' }}</li>
+            </ul>
+
+            {% elif product.accessory_details %}
+            <ul class="features">
+                <li>Назначение: {{ product.accessory_details.compatibility }}</li>
+                <li>Материал: {{ product.accessory_details.material }}</li>
+                <li>Цвет: {{ product.accessory_details.color }}</li>
+            </ul>
+            {% else %}
+            <p>Характеристики недоступны.</p>
+            {% endif %}
+
+
+            <form method="post" action="{{ url_for('cart.add_to_cart', product_id=product.id) }}">
+                <div class="quantity-selector">
+                    <button type="button" onclick="changeQty(-1)">−</button>
+                    <input type="number" name="quantity" id="quantity" value="1" min="1">
+                    <button type="button" onclick="changeQty(1)">+</button>
+                </div>
+                <button type="submit" class="btn-filled">Добавить в корзину</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="product-description">
+        <h3>Описание</h3>
+        <p>{{ product.description or 'Описание будет добавлено позже.' }}</p>
+    </div>
+</main>
+
+<script>
+    function changeQty(delta) {
+        const qtyInput = document.getElementById('quantity');
+        let current = parseInt(qtyInput.value);
+        if (!isNaN(current)) {
+            qtyInput.value = Math.max(1, current + delta);
+        }
+    }
+</script>
+{% endblock %}

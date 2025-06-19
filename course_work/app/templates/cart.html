@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Корзина{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='cart.css') }}">
+{% endblock %}
+
+
+{% block content %}
+<main class="container" id="main">
+    <div class="container cart-page">
+        <h1>Ваша корзина</h1>
+        {% if cart_items %}
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Товар</th>
+                    <th>Количество</th>
+                    <th>Цена</th>
+                    <th>Всего</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr>
+                    <td class="prod-info">
+                        <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
+                        <div>{{ item.product.name }}</div>
+                    </td>
+                    <td>
+                        <form method="post" action="{{ url_for('cart.update_quantity', item_id=item.id) }}"
+                            class="qty-form">
+                            <button type="submit" name="action" value="decrease">−</button>
+                            <span>{{ item.quantity }}</span>
+                            <button type="submit" name="action" value="increase">+</button>
+                        </form>
+                    </td>
+                    <td>{{ item.product.price }} ₽</td>
+                    <td>{{ (item.product.price * item.quantity) }} ₽</td>
+                    <td><a href="{{ url_for('cart.remove', item_id=item.id) }}" class="remove-btn">×</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="cart-summary">
+            <div><strong>Итого:</strong> {{ total_sum }} ₽</div>
+            <button onclick="openModal()" class="checkout-btn">Оформить заказ</button>
+        </div>
+        {% else %}
+        <p>Ваша корзина пуста.</p>
+        <a href="{{ url_for('catalog.catalog') }}" class="btn-outline">Перейти в каталог</a>
+        {% endif %}
+    </div>
+</main>
+
+<div class="modal" id="checkoutModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Оформление заказа</h2>
+        <form method="POST" action="{{ url_for('cart.checkout') }}">
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1;">
+                    <label>Имя</label>
+                    <input type="text" name="first_name" value="{{ current_user.first_name }}" disabled>
+                </div>
+                <div style="flex: 1;">
+                    <label>Фамилия</label>
+                    <input type="text" name="last_name" value="{{ current_user.last_name }}" disabled>
+                </div>
+            </div>
+
+            <label>Телефон</label>
+            <input type="tel" name="phone" required value="{{ current_user.phone or '' }}">
+
+            <label>Адрес доставки</label>
+            <textarea name="address" required></textarea>
+
+            <label>Ожидаемая дата доставки</label>
+            <input type="date" name="expected_delivery_date" required
+                min="{{ (datetime.utcnow() + timedelta(days=1)).strftime('%Y-%m-%d') }}">
+
+            <p><strong>Итого с учётом доставки: <span id="totalWithDelivery">{{ total_sum }} ₽</span></strong></p>
+
+            <button type="submit">Подтвердить заказ</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    function openModal() {
+        document.getElementById("checkoutModal").style.display = "block";
+    }
+    function closeModal() {
+        document.getElementById("checkoutModal").style.display = "none";
+    }
+    window.onclick = function (event) {
+        const modal = document.getElementById("checkoutModal");
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const dateInput = document.querySelector('input[name="expected_delivery_date"]');
+        const totalSpan = document.getElementById('totalWithDelivery');
+        const baseTotal = parseFloat("{{ total_sum }}");
+
+        dateInput.addEventListener('change', () => {
+            const date = new Date(dateInput.value);
+            const weekday = date.getDay(); // 0 (вс) - 6 (сб)
+            let delivery = 0;
+
+            if (baseTotal <= 3000) {
+                if (weekday === 0 || weekday === 6) {
+                    delivery = 800;
+                } else {
+                    delivery = 500;
+                }
+            }
+
+            const final = baseTotal + delivery;
+            totalSpan.innerText = `${final.toFixed(2)} ₽`;
+        });
+    });
+</script>
+{% endblock %}

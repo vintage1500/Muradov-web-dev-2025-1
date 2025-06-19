@@ -4,6 +4,19 @@ from app.models import db
  
 bp = Blueprint('main', __name__)
 
+from flask import render_template
+from app.repositories.route_repository import RouteRepository
+from app.extension import db
+
+repo = RouteRepository(db)
+
 @bp.route('/')
-def index(): 
-    return render_template('index.html')
+def index():
+    category_cards = repo.get_category_cards()
+    return render_template("index.html", category_cards=category_cards)
+
+
+@bp.route('/product/<int:product_id>')
+def product_detail(product_id):
+    product = repo.get_product_with_details(product_id)
+    return render_template('catalog/product_detail.html', product=product)

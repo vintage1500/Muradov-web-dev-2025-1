@@ -6,7 +6,8 @@
     <title>{% block title %}Kursa Web{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='catalog.css') }}">
+    {% block head %}
+    {% endblock %}
 </head>
 
 <body id="body">
@@ -29,8 +30,8 @@
 
             <nav class="nav-links">
                 {% if current_user.is_authenticated %}
-                <a href="{# url_for('cart.view_cart') #}" class="btn">Корзина</a>
-                <a href="{# url_for('user.profile') #}" class="btn">Кабинет</a>
+                <a href="{{ url_for('cart.cart') }}" class="btn">Корзина</a>
+                <a href="{{ url_for('profile.profile') }}" class="btn">Кабинет</a>
                 {% else %}
                 <a href="{{ url_for('auth.login') }}" class="btn-outline">Войти</a>
                 <a href="{{ url_for('auth.register') }}" class="btn-filled">Зарегистрироваться</a>
@@ -41,7 +42,16 @@
 
         {% endblock %}
     </header>
- 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
     {% block content %}
     <main class="container" id="main">
     </main>
@@ -49,7 +59,7 @@
 
     {% block footer %}
     <footer id="footer" class="footer">
-        &copy; 2025 Kursa Web
+        &copy; 2025 Kursa Web Guitar Shop Muradov Raul 231-329
     </footer>
     {% endblock %}
 </body>

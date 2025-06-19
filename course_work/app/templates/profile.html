@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<main class="container" id="main">
+    <h1 class="profile-heading">Личный кабинет</h1>
+    <div class="profile-card">
+        <div class="user-header">
+            <div class="avatar"></div>
+            <div class="user-info">
+                <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+                <p class="email">{{ user.login }}</p>
+            </div>
+        </div>
+
+        <h3 class="section-title">Личные данные</h3>
+        <div class="user-data">
+            <div>
+                <span class="label">Имя</span>
+                <div>{{ user.first_name }}</div>
+            </div>
+            <div>
+                <span class="label">Фамилия</span>
+                <div>{{ user.last_name }}</div>
+            </div>
+            <div>
+                <span class="label">Логин</span>
+                <div>{{ user.login }}</div>
+            </div>
+            <div>
+                <span class="label">Номер телефона</span>
+                <div>{{ user.phone or 'Не указан' }}</div>
+            </div>
+        </div>
+
+        <h3 class="section-title">История заказов</h3>
+        <div class="order-history">
+            {% for order in orders %}
+            <div class="order-block">
+                <div class="order-header">
+                    <div>
+                        <strong>Заказ №{{ order.id }}</strong><br>
+                        <small>Создан: {{ order.created_at.strftime('%d.%m.%Y') }}</small><br>
+                        <small>Доставка: {{ order.expected_delivery_date.strftime('%d.%m.%Y') }}</small>
+                    </div>
+                    <span class="status {{ order.status }}">
+                        {% if order.status == 'pending' %}Доставляется
+                        {% elif order.status == 'shipped' %}Доставлен
+                        {% elif order.status == 'cancelled' %}Отменён
+                        {% elif order.status == 'waiting_for_stock' %}Ожидает поступления
+                        {% endif %}
+                    </span>
+                </div>
+
+                {% set total_qty = order.items | map(attribute='quantity') | sum %}
+                <div class="order-qty"><strong>Всего товаров:</strong> {{ total_qty }}</div>
+
+                {% for item in order.items %}
+                <div class="order-item">
+                    <div class="item-image"></div>
+                    <div class="item-info">
+                        <div>{{ item.product.name }}</div>
+                        <div>{{ item.quantity }} × {{ item.price }} ₽</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</main>
+{% endblock %}

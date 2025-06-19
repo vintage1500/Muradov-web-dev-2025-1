@@ -18,29 +18,20 @@
     <section class="container text-center section-spacing">
         <h2>Категории товаров</h2>
         <div class="form-row">
-            {% for name, desc, image in [
-            ('Электрогитары', '42 модели',
-            'https://rockdale.ru/upload/iblock/e2e/auumor6cwcg0r2v1nwo65chaibyyhm95/A1216552241142.jpg'),
-            ('Акустические гитары', '42 модели',
-            'https://rockdale.ru/upload/iblock/2d4/267mzjk88lmt3t7i53hseh1qclzrvyve/A1582003255831.jpg'),
-            ('Бас-гитары', '42 модели',
-            'https://rockdale.ru/upload/iblock/af2/0b5159536qx56pyrfkbbu5legpb6iwuv/A1291952435571.jpeg'),
-            ('Аксессуары', 'Более 100 видов',
-            'https://diezshop.ru/d/alice_a007ksl_kapodastr_dlya_akusticheskoj_gitary_s_mediatorom4.webp')
-            ] %}
-            <div class="card guitar-category">
+            {% for card in category_cards %}
+            <a href="{{ card.link }}" class="card guitar-category">
                 <div class="card-image-placeholder">
-                    <img src="{{ image }}" alt="{{ name }}">
+                    <img src="{{ card.image }}" alt="{{ card.name }}">
                 </div>
                 <div class="card-info">
-                    <strong>{{ name }}</strong><br>
-                    <small>{{ desc }}</small>
+                    <strong>{{ card.name }}</strong><br>
+                    <small>{{ card.count }} моделей</small>
                 </div>
-            </div>
+            </a>
             {% endfor %}
         </div>
     </section>
-
+    
     <section class="container text-center section-spacing">
         <h2>Наши преимущества</h2>
         <div class="form-row">

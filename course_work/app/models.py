@@ -19,6 +19,8 @@ class User(db.Model, UserMixin):
     is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    cart_items = db.relationship('CartItem', back_populates='user', cascade='all, delete-orphan')
+
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
@@ -69,6 +71,7 @@ class Product(db.Model):
     order_items = db.relationship('OrderItem', backref='product', lazy=True)
     ratings = db.relationship('Rating', backref='product', lazy=True)
 
+    cart_items = db.relationship('CartItem', back_populates='product')
     def __repr__(self):
         return f'<Product {self.name}>'
 
@@ -149,3 +152,20 @@ class Rating(db.Model):
 
     def __repr__(self):
         return f'<Rating {self.stars} stars by User {self.user_id} for Product {self.product_id}>'
+     
+
+class CartItem(db.Model):
+    __tablename__ = 'cart_items'
+
+    id = db.Column(db.Integer, primary_key=True)
+    
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('Products.id'), nullable=False)
+    
+    quantity = db.Column(db.Integer, nullable=False, default=1)
+
+    user = db.relationship('User', back_populates='cart_items')
+    product = db.relationship('Product', back_populates='cart_items')
+
+    def __repr__(self):
+        return f'<CartItem {self.id}: {self.product.name} x{self.quantity}>'
