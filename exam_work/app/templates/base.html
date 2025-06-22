@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Приют животных</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <nav>
+        <div class="nav-left">
+            <a href="{{ url_for('animals.index') }}">Главная</a>
+        </div>
+        <div class="nav-right">
+            {% if current_user.is_authenticated %}
+                <span>{{ current_user.last_name }} {{ current_user.first_name }}</span>
+                <form action="{{ url_for('auth.logout') }}" method="post" style="display:inline;">
+                    <button type="submit">Выйти</button>
+                </form>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}">Войти</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <p>© 2025. Группа ИКБО-01-23. Иванов И.И.</p>
+    </footer>
+</body>
+</html>

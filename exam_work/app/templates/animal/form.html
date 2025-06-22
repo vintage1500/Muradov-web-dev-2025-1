@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ 'Редактировать' if edit else 'Добавить' }} животное</h1>
+
+<form method="post" enctype="multipart/form-data">
+    <label for="name">Имя:</label>
+    <input type="text" id="name" name="name" value="{{ animal.name if animal else '' }}" required>
+
+    <label for="breed">Порода:</label>
+    <input type="text" id="breed" name="breed" value="{{ animal.breed if animal else '' }}" required>
+
+    <label for="age_months">Возраст (в месяцах):</label>
+    <input type="number" id="age_months" name="age_months" value="{{ animal.age_months if animal else '' }}" required>
+
+    <label for="gender">Пол:</label>
+    <select id="gender" name="gender" required>
+        <option value="male" {% if animal and animal.gender=='male' %}selected{% endif %}>Мужской</option>
+        <option value="female" {% if animal and animal.gender=='female' %}selected{% endif %}>Женский</option>
+    </select>
+
+    <label for="status">Статус:</label>
+    <select id="status" name="status" required>
+        <option value="available" {% if not animal or animal.status=='available' %}selected{% endif %}>Доступно для
+            усыновления</option>
+        <option value="adoption" {% if animal and animal.status=='adoption' %}selected{% endif %}>В процессе усыновления
+        </option>
+        <option value="adopted" {% if animal and animal.status=='adopted' %}selected{% endif %}>Усыновлено</option>
+    </select>
+
+    <label for="description">Описание:</label>
+    <textarea id="description" name="description">{{ animal.description if animal else '' }}</textarea>
+
+    {% if not edit %}
+    <label for="images">Фотографии:</label>
+    <input type="file" id="images" name="images" accept="image/*" multiple>
+    {% endif %}
+
+    <button type="submit" class="button">Сохранить</button>
+    <a href="{{ url_for('animals.index') }}" class="button">Отмена</a>
+</form>
+
+<!-- EasyMDE Markdown Editor -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+<script>
+    const easyMDE = new EasyMDE({
+        element: document.getElementById("description"),
+        forceSync: true,
+        autoDownloadFontAwesome: false
+    });
+</script>
+{% endblock %}
