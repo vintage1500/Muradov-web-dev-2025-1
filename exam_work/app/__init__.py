@@ -8,6 +8,7 @@ from app.routes.auth import bp as auth_bp, init_login_manager
 from app.routes.animals import bp as animals_bp
 from app.routes.adoptions import bp as adoptions_bp
 
+
 def handle_sqlalchemy_error(err):
     error_msg = 'Ошибка при подключении к базе данных. Повторите попытку позже.'
     return f'{error_msg} (Подробнее: {err})', 500
@@ -28,5 +29,5 @@ def create_app(test_config=None):
     app.register_blueprint(adoptions_bp)
 
     app.errorhandler(SQLAlchemyError)(handle_sqlalchemy_error)
-
+     
     return app

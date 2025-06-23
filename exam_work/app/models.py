@@ -14,7 +14,7 @@ class User(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), nullable=False, unique=True)
-    password_hash = db.Column(db.String(128), nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
     last_name = db.Column(db.String(64), nullable=False)
     first_name = db.Column(db.String(64), nullable=False)
     patronymic = db.Column(db.String(64))
@@ -55,4 +55,4 @@ class Adoption(db.Model):
     created_at = db.Column(db.Date, default=datetime.utcnow)
     status = db.Column(db.String(32), nullable=False, default='pending')
 
-    user = db.relationship('User', backref='adoptions')
+    user = db.relationship('User', backref='adoptions') 

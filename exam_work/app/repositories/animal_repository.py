@@ -24,3 +24,5 @@ class AnimalRepository:
         animal = self.get_animal_by_id(animal_id)
         self.db.session.delete(animal)
         self.db.session.commit()
+
+        

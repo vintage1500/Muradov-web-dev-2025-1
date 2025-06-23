@@ -4,41 +4,61 @@
 <h1>Животные в приюте</h1>
 
 {% if current_user.is_authenticated and current_user.role.name == 'admin' %}
-    <a class="button" href="{{ url_for('animals.add_animal') }}">Добавить животное</a>
+<a class="button" href="{{ url_for('animals.add_animal') }}">Добавить животное</a>
 {% endif %}
 
 <div class="card-grid">
     {% for animal in animals %}
-        <div class="card">
-            <h2>{{ animal.name }}</h2>
-            <p><strong>Порода:</strong> {{ animal.breed }}</p>
-            <p><strong>Возраст:</strong> {{ animal.age_months }} мес.</p>
-            <p><strong>Пол:</strong> {{ animal.gender }}</p>
-            <p><strong>Статус:</strong> 
-                {% if animal.status == 'available' %}Доступно для усыновления
-                {% elif animal.status == 'adoption' %}В процессе усыновления
-                {% else %}Уже усыновлено{% endif %}
-            </p>
-            <a href="{{ url_for('animals.animal_detail', animal_id=animal.id) }}" class="button">Просмотр</a>
-            {% if current_user.is_authenticated and current_user.role.name in ['admin', 'moderator'] %}
-                <a href="{{ url_for('animals.edit_animal', animal_id=animal.id) }}" class="button">Редактировать</a>
-            {% endif %}
-            {% if current_user.is_authenticated and current_user.role.name == 'admin' %}
-                <form action="{{ url_for('animals.delete_animal_route', animal_id=animal.id) }}" method="post" style="display:inline">
-                    <button type="submit" class="button delete">Удалить</button>
-                </form>
-            {% endif %}
-        </div>
+    <div class="card">
+        <h2>{{ animal.name }}</h2>
+        <p><strong>Порода:</strong> {{ animal.breed }}</p>
+        <p><strong>Возраст:</strong> {{ animal.age_months }} мес.</p>
+        <p><strong>Пол:</strong> {{ animal.gender }}</p>
+        <p><strong>Статус:</strong>
+            {% if animal.status == 'available' %}Доступно для усыновления
+            <!-- {# elif animal.status == 'adoption' #}В процессе усыновления -->
+            {% else %}Уже усыновлено{% endif %}
+        </p>
+        <a href="{{ url_for('animals.animal_detail', animal_id=animal.id) }}" class="button">Просмотр</a>
+        {% if current_user.is_authenticated and current_user.role.name in ['admin', 'moderator'] %}
+        <a href="{{ url_for('animals.edit_animal', animal_id=animal.id) }}" class="button">Редактировать</a>
+        {% endif %}
+        {% if current_user.is_authenticated and current_user.role.name == 'admin' %}
+        <form action="{{ url_for('animals.delete_animal_route', animal_id=animal.id) }}" method="post"
+            style="display:inline">
+            <!-- Кнопка удаления -->
+            <button type="button" class="button delete"
+                onclick="openDeleteModal('{{ animal.id }}', '{{ animal.name }}')">Удалить</button>
+
+        </form>
+        {% endif %}
+    </div>
     {% endfor %}
+</div>
+
+
+
+<!-- Модальное окно -->
+<div id="deleteModal" class="modal hidden">
+    <div class="modal-content">
+        <h3>Удаление животного</h3>
+        <p id="deleteText"></p>
+        <div class="modal-buttons">
+            <form id="deleteForm" method="POST">
+                <button type="submit" class="button danger">Да</button>
+                <button type="button" class="button" onclick="closeDeleteModal()">Нет</button>
+            </form>
+        </div>
+    </div>
 </div>
 
 <div class="pagination">
     {% if pagination.has_prev %}
-        <a href="{{ url_for('animals.index', page=pagination.prev_num) }}">&laquo; Назад</a>
+    <a href="{{ url_for('animals.index', page=pagination.prev_num) }}">&laquo; Назад</a>
     {% endif %}
     <span>Страница {{ pagination.page }} из {{ pagination.pages }}</span>
     {% if pagination.has_next %}
-        <a href="{{ url_for('animals.index', page=pagination.next_num) }}">Вперёд &raquo;</a>
+    <a href="{{ url_for('animals.index', page=pagination.next_num) }}">Вперёд &raquo;</a>
     {% endif %}
 </div>
 {% endblock %}

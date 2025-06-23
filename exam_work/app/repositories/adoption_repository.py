@@ -38,3 +38,23 @@ class AdoptionRepository:
         adoption = Adoption.query.get_or_404(adoption_id)
         adoption.status = 'rejected'
         self.db.session.commit()
+
+    def has_adoption(self, animal_id, user_id):
+        return self.db.session.query(
+            self.db.exists().where(
+                (Adoption.animal_id == animal_id) &
+                (Adoption.user_id == user_id)
+            )
+        ).scalar()
+
+    def create_adoption(self, animal_id, user_id, contact_info):
+        adoption = Adoption(
+            animal_id=animal_id,
+            user_id=user_id,
+            contact_info=contact_info
+        )
+        self.db.session.add(adoption)
+        self.db.session.commit()
+
+    def get_user_adoption_for_animal(self, user_id, animal_id):
+        return Adoption.query.filter_by(user_id=user_id, animal_id=animal_id).first()

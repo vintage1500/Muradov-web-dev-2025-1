@@ -49,3 +49,23 @@ def reject_adoption(adoption_id):
         flash('Ошибка при отклонении заявки.', 'danger')
 
     return redirect(request.referrer or url_for('animals.index'))
+    
+@bp.route('/<int:animal_id>/adopt', methods=['POST'])
+@login_required
+def adopt(animal_id):
+    user = current_user
+
+    if adoption_repo.has_adoption(animal_id, user.id):
+        flash("Вы уже оставили заявку на этого животного.", "danger")
+        return redirect(url_for('animals.detail', animal_id=animal_id))
+
+    contact_info = request.form.get('contact_info')
+
+    adoption_repo.create_adoption(
+        animal_id=animal_id,
+        user_id=user.id,
+        contact_info=contact_info
+    )
+
+    flash("Заявка успешно отправлена!", "success")
+    return redirect(url_for('animals.detail', animal_id=animal_id))

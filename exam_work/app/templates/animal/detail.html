@@ -18,53 +18,74 @@
     {% if animal.photos %}
     <div class="photo-gallery">
         {% for photo in animal.photos %}
-            <img src="{{ url_for('static', filename='images/' ~ photo.filename) }}" alt="Фото животного">
+        <img src="{{ url_for('static', filename='images/' ~ photo.filename) }}" alt="Фото животного">
         {% endfor %}
     </div>
     {% endif %}
 </div>
 
 {% if current_user.is_authenticated and current_user.role.name in ['admin', 'moderator'] %}
-    <h2>Заявки на усыновление</h2>
-    {% if animal.adoptions %}
-        <ul>
-        {% for adoption in animal.adoptions %}
-            <li>
-                {{ adoption.user.last_name }} {{ adoption.user.first_name }} — {{ adoption.contact_info }}
-                ({{ adoption.created_at.strftime('%d.%m.%Y') }}) — <strong>{{ adoption.status }}</strong>
-                {% if adoption.status == 'pending' %}
-                    <form method="post" action="{{ url_for('adoptions.accept_adoption', adoption_id=adoption.id) }}" style="display:inline;">
-                        <button class="button" type="submit">Принять</button>
-                    </form>
-                    <form method="post" action="{{ url_for('adoptions.reject_adoption', adoption_id=adoption.id) }}" style="display:inline;">
-                        <button class="button" type="submit">Отклонить</button>
-                    </form>
-                {% endif %}
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>Нет заявок.</p>
-    {% endif %}
+<h2>Заявки на усыновление</h2>
+{% if animal.adoptions %}
+<ul>
+    {% for adoption in animal.adoptions %}
+    <li>
+        {{ adoption.user.last_name }} {{ adoption.user.first_name }} — {{ adoption.contact_info }}
+        ({{ adoption.created_at.strftime('%d.%m.%Y') }}) — <strong>{{ adoption.status }}</strong>
+        {% if adoption.status == 'pending' %}
+        <form method="post" action="{{ url_for('adoptions.accept_adoption', adoption_id=adoption.id) }}"
+            style="display:inline;">
+            <button class="button" type="submit">Принять</button>
+        </form>
+        <form method="post" action="{{ url_for('adoptions.reject_adoption', adoption_id=adoption.id) }}"
+            style="display:inline;">
+            <button class="button" type="submit">Отклонить</button>
+        </form>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Нет заявок.</p>
+{% endif %}
 {% endif %}
 
 {% if current_user.is_authenticated and current_user.role.name == 'user' %}
-    {% set my_adoption = None %}
-    {% for adoption in animal.adoptions %}
-        {% if adoption.user_id == current_user.id %}
-            {% set my_adoption = adoption %}
-        {% endif %}
-    {% endfor %}
+{% set my_adoption = None %}
+{% for adoption in animal.adoptions %}
+{% if adoption.user_id == current_user.id %}
+{% set my_adoption = adoption %}
+{% endif %}
+{% endfor %}
 
-    {% if not my_adoption %}
-        <form method="post" action="{{ url_for('adoptions.send_adoption_request', animal_id=animal.id) }}">
-            <label for="contact_info">Контактные данные:</label>
-            <input type="text" name="contact_info" id="contact_info" required>
-            <button class="button" type="submit">Подать заявку на усыновление</button>
-        </form>
+{% if current_user.is_authenticated %}
+    {% if has_adoption %}
+        <div class="card">
+            <strong>Статус вашей заявки:</strong><br>
+            {% if has_adoption.status == 'pending' %}
+                <span class="text-muted">В ожидании рассмотрения</span>
+            {% elif has_adoption.status == 'accepted' %}
+                <span class="text-success">Заявка одобрена</span>
+            {% elif has_adoption.status == 'rejected' %}
+                <span class="text-danger">Заявка отклонена</span>
+            {% elif has_adoption.status == 'rejected_adopted' %}
+                <span class="text-danger">Заявка отклонена</span>
+            {% else %}
+                <span class="text-muted">Неизвестный статус</span>
+            {% endif %}
+        </div>
     {% else %}
-        <p><strong>Вы уже подали заявку:</strong> {{ my_adoption.contact_info }} — {{ my_adoption.status }}</p>
+        <form method="post" action="{{ url_for('adoptions.send_adoption_request', animal_id=animal.id) }}">
+            <div class="card">
+                <label for="contact_info">Контактная информация:</label>
+                <input type="text" name="contact_info" id="contact_info" required>
+                <button type="submit" class="button">Подать заявку</button>
+            </div>
+        </form>
     {% endif %}
+{% endif %}
+
+
 {% endif %}
 
 <a href="{{ url_for('animals.index') }}" class="button">Назад</a>

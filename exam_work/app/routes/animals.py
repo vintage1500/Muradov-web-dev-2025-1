@@ -5,8 +5,11 @@ import bleach # нужно для безопасной очистки html-ко�
 from werkzeug.utils import secure_filename # очищает имя загружаемого файла для безопасного хранения
 from app.extensions import db
 from app.repositories.animal_repository import AnimalRepository
+from app.repositories.adoption_repository import AdoptionRepository
+
 
 animal_repo = AnimalRepository(db)
+adoption_repo = AdoptionRepository(db)
 
 bp = Blueprint('animals', __name__)
 
@@ -19,7 +22,10 @@ def index():
 @bp.route('/animals/<int:animal_id>')
 def animal_detail(animal_id):
     animal = animal_repo.get_animal_by_id(animal_id)
-    return render_template('animal/detail.html', animal=animal)
+    has_adoption = False
+    if current_user.is_authenticated:
+        has_adoption = adoption_repo.get_user_adoption_for_animal(current_user.id, animal.id)
+    return render_template('animal/detail.html', animal=animal, has_adoption=has_adoption)
 
 @bp.route('/animals/add', methods=['GET', 'POST'])
 @login_required
@@ -51,6 +57,7 @@ def add_animal():
         for image in images:
             if image.filename:
                 filename = secure_filename(image.filename)
+                os.makedirs(current_app.config['UPLOAD_FOLDER'], exist_ok=True)
                 filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
                 image.save(filepath)
                 files_data.append({'filename': filename, 'mime': image.mimetype})
@@ -100,11 +107,19 @@ def delete_animal_route(animal_id):
         flash('У вас недостаточно прав для выполнения данного действия.', 'danger')
         return redirect(url_for('animals.index'))
 
+    animal = animal_repo.get_animal_by_id(animal_id)
     try:
+        # Удалить фото с диска
+        for photo in animal.photos:
+            path = os.path.join(current_app.config['UPLOAD_FOLDER'], photo.filename)
+            if os.path.exists(path):
+                os.remove(path)
+
+        # Удалить животное из базы
         animal_repo.delete_animal(animal_id)
-        flash('Животное успешно удалено.', 'success')
-    except Exception:
+        flash(f'Животное {animal.name} успешно удалено.', 'success')
+    except Exception as e:
         db.session.rollback()
-        flash('Ошибка при удалении.', 'danger')
+        flash('Ошибка при удалении животного.', 'danger')
 
     return redirect(url_for('animals.index'))
