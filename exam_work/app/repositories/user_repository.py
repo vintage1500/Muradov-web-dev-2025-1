@@ -1,4 +1,4 @@
-from exam_work.app.models import User
+from app.models import User
 
 class UserRepository:
     def __init__(self, db):

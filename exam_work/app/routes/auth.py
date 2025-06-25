@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required, LoginManager
 from werkzeug.security import check_password_hash
-from exam_work.app.repositories.user_repository import UserRepository
-from exam_work.app.extensions import db
+from app.repositories.user_repository import UserRepository
+from app.extensions import db
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 user_repo = UserRepository(db)

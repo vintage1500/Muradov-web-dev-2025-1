@@ -3,9 +3,9 @@ from flask_login import login_required, current_user
 import os
 import bleach # нужно для безопасной очистки html-контента (экранирует теги например)
 from werkzeug.utils import secure_filename # очищает имя загружаемого файла для безопасного хранения
-from exam_work.app.extensions import db
-from exam_work.app.repositories.animal_repository import AnimalRepository
-from exam_work.app.repositories.adoption_repository import AdoptionRepository
+from app.extensions import db
+from app.repositories.animal_repository import AnimalRepository
+from app.repositories.adoption_repository import AdoptionRepository
 
 
 animal_repo = AnimalRepository(db)
