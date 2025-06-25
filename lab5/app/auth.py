@@ -25,6 +25,8 @@ class User(UserMixin):
         self.created_at = user_data.created_at
         self.role_id = user_data.role_id
         self.role = user_data.role 
+
+        self.role = user_data.role if hasattr(user_data, 'role') else None
         
 @login_manager.user_loader
 def load_user(user_id):

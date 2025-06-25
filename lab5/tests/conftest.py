@@ -1,105 +1,101 @@
-from functools import reduce
-from collections import namedtuple
-import logging
 import pytest
-import mysql.connector
-from app import create_app
-from app.db import DBConnector
-from app.repositories.visit_repository import VisitRepository
+from app import create_app, db as _db
+from app.models import User, Role
+from flask_login import login_user
+from werkzeug.security import generate_password_hash
 
-TEST_DB_CONFIG = {
-    'MYSQL_USER': 'root',
-    'MYSQL_PASSWORD': '123',
-    'MYSQL_HOST': 'localhost',
-    'MYSQL_DATABASE': 'lab4_visit_tests',
-}
 
-def get_connection(app):
-    return mysql.connector.connect(
-        user=app.config['MYSQL_USER'],
-        password=app.config['MYSQL_PASSWORD'],
-        host=app.config['MYSQL_HOST']
-    )
-
-def setup_db(app):
-    logging.getLogger().info("Create test DB and schema...")
-    db_name = app.config['MYSQL_DATABASE']
-    create_query = (
-        f"DROP DATABASE IF EXISTS {db_name};"
-        f"CREATE DATABASE {db_name};"
-        f"USE {db_name};"
-    )
-
-    with app.open_resource('schema.sql') as f:
-        schema = f.read().decode('utf8')
-
-    connection = get_connection(app)
-    query = '\n'.join([create_query, schema])
-    with connection.cursor(named_tuple=True) as cursor:
-        for _ in cursor.execute(query, multi=True):
-            pass
-    connection.commit()
-    connection.close()
-
-def teardown_db(app):
-    logging.getLogger().info("Drop test DB...")
-    db_name = app.config['MYSQL_DATABASE']
-    connection = get_connection(app)
-    with connection.cursor() as cursor:
-        cursor.execute(f"DROP DATABASE IF EXISTS {db_name};")
-    connection.close()
-
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def app():
-    return create_app(TEST_DB_CONFIG)
+    app = create_app({
+        'TESTING': True,
+        'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
+        'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+        'WTF_CSRF_ENABLED': False,
+        'LOGIN_DISABLED': False,
+        'SECRET_KEY': 'test',
+    })
 
-@pytest.fixture(scope="session")
-def db_connector(app):
-    setup_db(app)
     with app.app_context():
-        connector = DBConnector(app)
-        yield connector
-        connector.disconnect()
-    teardown_db(app)
+        _db.create_all()
+        yield app
+        _db.drop_all()
 
-@pytest.fixture
-def visit_repository(db_connector):
-    return VisitRepository(db_connector)
 
-@pytest.fixture
-def clear_visit_logs(db_connector):
-    with db_connector.connect().cursor() as cursor:
-        cursor.execute("DELETE FROM visit_logs;")
-        db_connector.connect().commit()
-    yield
+@pytest.fixture(scope='function')
+def db(app):
+    """Фикстура для базы данных. Очищает таблицы между тестами."""
+    _db.session.begin_nested()
 
-@pytest.fixture
-def example_visits(db_connector):
-    """Добавляет два примера посещений в таблицу visit_logs."""
-    data = [
-        (1, "home"),
-        (2, "about"),
-    ]
-    row_class = namedtuple("Visit", ["id", "user_id", "page"])
-    connection = db_connector.connect()
-    with connection.cursor() as cursor:
-        placeholders = ', '.join(['(%s, %s)' for _ in data])
-        query = f"INSERT INTO visit_logs(user_id, page) VALUES {placeholders};"
-        flat_data = reduce(lambda acc, tup: acc + list(tup), data, [])
-        cursor.execute(query, flat_data)
-        db_connector.connect().commit()
+    yield _db
 
-    with connection.cursor(named_tuple=True) as cursor:
-        cursor.execute("SELECT id, user_id, page FROM visit_logs ORDER BY id ASC;")
-        rows = cursor.fetchall()
+    _db.session.rollback()
 
-    visits = [row_class(row.id, row.user_id, row.page) for row in rows]
-    yield visits
 
-    with connection.cursor() as cursor:
-        cursor.execute("DELETE FROM visit_logs;")
-        db_connector.connect().commit()
-
-@pytest.fixture
-def client(app):
+@pytest.fixture(scope='function')
+def client(app, db):
+    """Тестовый клиент Flask."""
     return app.test_client()
+
+
+@pytest.fixture
+def admin_user(db):
+    from app.models import Role, User
+
+    # Очистка пользователей и ролей
+    User.query.filter_by(username='admin').delete()
+    Role.query.filter_by(id=1).delete()
+    db.session.commit()
+
+    role = Role(id=1, name='Администратор')
+    db.session.add(role)
+    db.session.commit()
+
+    user = User(
+        username='admin',
+        first_name='Админ',
+        last_name='Главный',
+        password_hash=generate_password_hash('Admin123!'),
+        role_id=1
+    )
+    db.session.add(user)
+    db.session.commit()
+    return user
+
+
+@pytest.fixture(scope='function')
+def regular_user(db):
+    # Очистка ролей перед созданием
+    from app.models import Role, User
+
+    User.query.filter_by(username='user').delete()
+    Role.query.delete()
+    db.session.commit()
+
+    role = Role(id=2, name="Пользователь")
+    db.session.add(role)
+    db.session.commit()
+
+    from app.models import User
+    user = User(
+        username='user',
+        first_name='Обычный',
+        middle_name='',
+        last_name='Пользователь',
+        role_id=2,
+        password_hash=generate_password_hash('User123!')
+    )
+    db.session.add(user)
+    db.session.commit()
+    return user
+
+
+
+def login(client, username, password):
+    response = client.post('/auth/login', data={
+        'username': username,
+        'password': password
+    }, follow_redirects=True)
+    html = response.get_data(as_text=True)
+    assert 'Выйти' in html or 'Авторизация прошла успешно' in html
+    return response
