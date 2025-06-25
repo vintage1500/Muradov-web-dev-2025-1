@@ -4,12 +4,12 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from .extension import db
 from . import models
-from app.auth import bp as auth_bp, init_login_manager
-from app.routes import bp as main_bp
-from app.catalogs import bp as catalog_bp
-from app.cart import bp as cart_bp
-from app.profile import bp as profile_bp
-from app.admin import bp as admin_bp
+from course_work.app.auth import bp as auth_bp, init_login_manager
+from course_work.app.routes import bp as main_bp
+from course_work.app.catalogs import bp as catalog_bp
+from course_work.app.cart import bp as cart_bp
+from course_work.app.profile import bp as profile_bp
+from course_work.app.admin import bp as admin_bp
 
 
 def handle_sqlalchemy_error(err):

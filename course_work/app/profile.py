@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 from flask_login import login_required, current_user
-from app.models import Order
+from course_work.app.models import Order
 
 bp = Blueprint('profile', __name__, url_prefix='/profile')
 

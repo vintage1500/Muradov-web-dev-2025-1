@@ -1,4 +1,4 @@
-from app.models import Product, Category, Brand
+from course_work.app.models import Product, Category, Brand
 from sqlalchemy import or_
 
 class CatalogRepository:

@@ -1,4 +1,4 @@
-from app.models import AccessoryDetail, Product, Category, Brand, Order, GuitarDetail
+from course_work.app.models import AccessoryDetail, Product, Category, Brand, Order, GuitarDetail
 
 class AdminRepository:
     def __init__(self, db):

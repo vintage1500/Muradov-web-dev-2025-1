@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from app.models import Category, Product
+from course_work.app.models import Category, Product
 from flask import abort, url_for
 
 class RouteRepository:

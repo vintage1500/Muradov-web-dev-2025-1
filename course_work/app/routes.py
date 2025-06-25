@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, send_from_directory, current_app, abort
-from app.repositories import user_repository
-from app.models import db 
-from app.repositories.route_repository import RouteRepository 
+from course_work.app.repositories import user_repository
+from course_work.app.models import db 
+from course_work.app.repositories.route_repository import RouteRepository 
  
 bp = Blueprint('main', __name__)
 

@@ -5,9 +5,9 @@ from .extension import db
 bp = Blueprint('catalog', __name__, url_prefix='/catalog')
 
 from flask import request, render_template
-from app.models import Category, Brand
-from app.repositories.catalog_repository import CatalogRepository
-from app.extension import db
+from course_work.app.models import Category, Brand
+from course_work.app.repositories.catalog_repository import CatalogRepository
+from course_work.app.extension import db
 
 catalog_repo = CatalogRepository(db)
 

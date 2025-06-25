@@ -1,4 +1,4 @@
-from app.models import User
+from course_work.app.models import User
 from werkzeug.security import generate_password_hash
 
 class UserRepository:

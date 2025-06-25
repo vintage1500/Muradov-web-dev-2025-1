@@ -1,5 +1,5 @@
 from datetime import datetime
-from app.extensions import db
+from exam_work.app.extensions import db
 from flask_login import UserMixin
 
 class Role(db.Model):

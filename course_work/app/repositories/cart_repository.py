@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from calendar import SATURDAY, SUNDAY
 from decimal import Decimal
-from app.models import Order, OrderItem, CartItem, Product
+from course_work.app.models import Order, OrderItem, CartItem, Product
 from sqlalchemy.orm import Session 
 from sqlalchemy.exc import NoResultFound
 
