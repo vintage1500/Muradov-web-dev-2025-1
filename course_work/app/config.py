@@ -7,10 +7,10 @@ MYSQL_PASSWORD = '12345678'
 MYSQL_HOST = '127.0.0.1'
 MYSQL_DATABASE = 'course_work_db1'
 
-# MYSQL_USER = 'vintage150'
-# MYSQL_PASSWORD = 'Qwerty123!'
-# MYSQL_HOST = 'vintage150.mysql.pythonanywhere-services.com'
-# MYSQL_DATABASE = 'vintage150$lab5'
+MYSQL_USER = 'vintage150'
+MYSQL_PASSWORD = 'Qwerty123!'
+MYSQL_HOST = 'vintage150.mysql.pythonanywhere-services.com'
+MYSQL_DATABASE = 'vintage150$course_work'
 
 SQLALCHEMY_DATABASE_URI = (
     f"mysql+mysqlconnector://{MYSQL_USER}:{MYSQL_PASSWORD}"
