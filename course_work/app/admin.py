@@ -1,8 +1,10 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from .extension import db
 from .decorators import admin_required
 from .repositories.admin_repository import AdminRepository
+import os
+from werkzeug.utils import secure_filename
 
 admin_repo = AdminRepository(db)
 
@@ -49,15 +51,49 @@ def users():
     return render_template('admin/users.html', users=users)
         
 
+from flask import current_app
+from werkzeug.utils import secure_filename
+import os
+
 @bp.route('/products/add', methods=['GET', 'POST'])
+@login_required
+@admin_required
 def add_product():
     admin_repo = AdminRepository(db)
 
     if request.method == 'POST':
         category_id = request.form.get('category_id', type=int)
-        cat_is_guitar = category_id in [1, 2, 3, 4, 5]
-        cat_is_accessory = category_id in [6, 7, 8, 9, 10]
 
+        # 1. Загружаем изображение
+        image_file = request.files.get('image_file')
+        filename = 'default.jpg'
+
+        if image_file and image_file.filename:
+            filename = secure_filename(image_file.filename)
+            save_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            print("→ Попытка сохранить файл:", save_path)
+
+            try:
+                os.makedirs(os.path.dirname(save_path), exist_ok=True)
+                image_file.save(save_path)
+                print("✅ Файл сохранён:", filename)
+            except Exception as e:
+                print("⛔ Ошибка при сохранении файла:", e)
+                filename = 'default.jpg'
+        else:
+            print("⚠️ Файл не передан или пустой")
+
+        # 2. Категория и аксессуары
+        guitar_names = ['Электрогитары', 'Акустические гитары', 'Бас-гитары', 'Укулеле', 'Классические гитары']
+        accessory_names = ['Чехлы', 'Струны', 'Тюнеры', 'Каподастры', 'Ремни']
+
+        guitar_ids = admin_repo.get_category_ids_by_names(guitar_names)
+        accessory_ids = admin_repo.get_category_ids_by_names(accessory_names)
+
+        cat_is_guitar = category_id in guitar_ids
+        cat_is_accessory = category_id in accessory_ids
+
+        # 3. Формируем данные
         product_data = {
             "name": request.form['name'],
             "description": request.form.get('description'),
@@ -66,11 +102,10 @@ def add_product():
             "stock_quantity": request.form.get('stock_quantity', type=int),
             "category_id": category_id,
             "brand_id": request.form.get('brand_id', type=int),
-            "image_url": "default.jpg"
+            "image_url": f"/static/images/{filename}"
         }
 
-        guitar_data = None
-        accessory_data = None
+        guitar_data = accessory_data = None
 
         if cat_is_guitar:
             guitar_data = {
@@ -98,6 +133,8 @@ def add_product():
 
 
 @bp.route('/admin/products/<int:product_id>/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
 def edit_product(product_id):
     admin_repo = AdminRepository(db)
     product = admin_repo.get_product_by_id(product_id)
@@ -106,9 +143,29 @@ def edit_product(product_id):
 
     if request.method == 'POST':
         category_id = request.form.get('category_id', type=int)
-        cat_is_guitar = category_id in [1, 2, 3, 4, 5]
-        cat_is_accessory = category_id in [6, 7, 8, 9, 10]
 
+        # Получаем ID категорий по названиям
+        guitar_names = ['Электрогитары', 'Акустические гитары', 'Бас-гитары', 'Укулеле', 'Классические гитары']
+        accessory_names = ['Чехлы', 'Струны', 'Тюнеры', 'Каподастры', 'Ремни']
+
+        guitar_ids = admin_repo.get_category_ids_by_names(guitar_names)
+        accessory_ids = admin_repo.get_category_ids_by_names(accessory_names)
+
+        cat_is_guitar = category_id in guitar_ids
+        cat_is_accessory = category_id in accessory_ids
+
+        # Обработка изображения
+        image_file = request.files.get('image_file')
+        image_url = product.image_url  # по умолчанию оставить текущее
+
+        if image_file and image_file.filename:
+            filename = secure_filename(image_file.filename)
+            save_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            image_file.save(save_path)
+            image_url = f"/static/images/{filename}"
+
+        # Основные данные
         product_data = {
             "name": request.form['name'],
             "description": request.form.get('description'),
@@ -117,7 +174,7 @@ def edit_product(product_id):
             "stock_quantity": request.form.get('stock_quantity', type=int),
             "category_id": category_id,
             "brand_id": request.form.get('brand_id', type=int),
-            "image_url": "default.jpg"
+            "image_url": image_url
         }
 
         guitar_data = None
@@ -158,3 +215,4 @@ def delete_product(product_id):
     admin_repo.delete_product(product)
     flash("Товар успешно удалён", "success")
     return redirect(url_for("admin.products"))
+

@@ -1,4 +1,5 @@
-from course_work.app.models import AccessoryDetail, Product, Category, Brand, Order, GuitarDetail
+from course_work.app.models import AccessoryDetail, Product, Category, Brand, Order, GuitarDetail, OrderItem
+
 
 class AdminRepository:
     def __init__(self, db):
@@ -48,7 +49,7 @@ class AdminRepository:
         return product
     
     def update_full_product(self, product, product_data, guitar_data=None, accessory_data=None):
-        # Обновляем базу продукта
+        # Обновляем поля
         product.name = product_data["name"]
         product.description = product_data.get("description")
         product.price = product_data["price"]
@@ -56,7 +57,7 @@ class AdminRepository:
         product.stock_quantity = product_data["stock_quantity"]
         product.category_id = product_data["category_id"]
         product.brand_id = product_data["brand_id"]
-        product.image_url = product_data.get("image_url", "default.jpg")
+        product.image_url = product_data.get("image_url", product.image_url)
 
         # Гитара
         if guitar_data:
@@ -68,7 +69,7 @@ class AdminRepository:
                 gd.neck_material = guitar_data.get("neck_material")
                 gd.pickups = guitar_data.get("pickups")
             else:
-                self.db.session.commit(GuitarDetail(
+                self.db.session.add(GuitarDetail(
                     product_id=product.id,
                     **guitar_data
                 ))
@@ -86,8 +87,45 @@ class AdminRepository:
                     **accessory_data
                 ))
 
+        # Попробуем обновить статусы заказов, если пополнился склад
+        if product.stock_quantity > 0:
+            self.try_fulfill_backorders(product)
+
         self.db.session.commit()
         return product
+
+    def try_fulfill_backorders(self, product: Product):
+    # Получаем заказы, ожидающие поставки, отсортированные по дате
+        waiting_orders = (
+            self.db.session.query(Order)
+            .join(Order.items)
+            .filter(Order.status == 'waiting_for_stock')
+            .filter(OrderItem.product_id == product.id)
+            .order_by(Order.created_at.asc())
+            .all()
+        )
+
+        for order in waiting_orders:
+            can_fulfill = True
+
+            for item in order.items:
+                if item.product_id == product.id:
+                    if product.stock_quantity < item.quantity:
+                        can_fulfill = False
+                        break
+
+            if can_fulfill:
+                # Обновляем заказ
+                order.status = 'pending'
+                for item in order.items:
+                    if item.product_id == product.id:
+                        product.stock_quantity -= item.quantity
+
+                        # Защита от отрицательного остатка
+                        if product.stock_quantity < 0:
+                            product.stock_quantity = 0
+
+        self.db.session.commit()
 
     def delete_product(self, product):
         self.db.session.delete(product)
@@ -116,5 +154,10 @@ class AdminRepository:
 
     def get_all_brands(self):
         return Brand.query.all()
+    
+    def get_category_ids_by_names(self, names: list[str]) -> list[int]:
+        return [
+            c.id for c in Category.query.filter(Category.name.in_(names)).all()
+        ]
 
     

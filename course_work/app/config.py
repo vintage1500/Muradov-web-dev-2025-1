@@ -2,10 +2,10 @@ import os
 
 SECRET_KEY = '8806d05fdb32c6b25bbe417def4258c5e9b4dc4d865aa57a66105ce119d3da2e'
 
-MYSQL_USER = 'root'
-MYSQL_PASSWORD = '12345678'
-MYSQL_HOST = '127.0.0.1'
-MYSQL_DATABASE = 'course_work_db1'
+# MYSQL_USER = 'root'
+# MYSQL_PASSWORD = '12345678'
+# MYSQL_HOST = '127.0.0.1'
+# MYSQL_DATABASE = 'course_work_db1'
 
 MYSQL_USER = 'vintage150'
 MYSQL_PASSWORD = 'Qwerty123!'
@@ -22,7 +22,6 @@ SQLALCHEMY_ECHO = True
 
 UPLOAD_FOLDER = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    '..',
-    'media',
+    'static',
     'images'
 )

@@ -8,7 +8,8 @@
 {% block content %}
 <main class="container" id="main">
     <h1>{{ 'Редактировать' if product else 'Добавить' }} товар</h1>
-    <form class="add-form" method="POST" action="{% if product %}{{ url_for('admin.edit_product', product_id=product.id) }}{% else %}{{ url_for('admin.add_product') }}{% endif %}">
+    <form class="add-form" method="POST" enctype="multipart/form-data"
+        action="{% if product %}{{ url_for('admin.edit_product', product_id=product.id) }}{% else %}{{ url_for('admin.add_product') }}{% endif %}">
         <label>Название</label>
         <input type="text" name="name" value="{{ product.name if product else '' }}" required>
 
@@ -22,44 +23,58 @@
         <input type="text" name="sku" value="{{ product.sku if product else '' }}" required>
 
         <label>Количество на складе</label>
-        <input type="number" name="stock_quantity" min="0" value="{{ product.stock_quantity if product else 0 }}" required>
+        <input type="number" name="stock_quantity" min="0" value="{{ product.stock_quantity if product else 0 }}"
+            required>
 
         <label>Категория</label>
         <select name="category_id" id="category" required onchange="updateFormByCategory()">
             {% for category in categories %}
-            <option value="{{ category.id }}" {% if product and product.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+            <option value="{{ category.id }}" {% if product and product.category_id==category.id %}selected{% endif %}>
+                {{ category.name }}</option>
             {% endfor %}
         </select>
 
         <label>Бренд</label>
         <select name="brand_id" required>
             {% for brand in brands %}
-            <option value="{{ brand.id }}" {% if product and product.brand_id == brand.id %}selected{% endif %}>{{ brand.name }}</option>
+            <option value="{{ brand.id }}" {% if product and product.brand_id==brand.id %}selected{% endif %}>{{
+                brand.name }}</option>
             {% endfor %}
         </select>
+
+        <label>Изображение</label>
+        <input type="file" name="image_file">
 
         <div id="guitar-fields" style="display:none;">
             <h4>Характеристики гитары</h4>
             <label>Тип</label>
-            <input type="text" name="guitar_type" value="{{ product.guitar_details.type if product and product.guitar_details else '' }}">
+            <input type="text" name="guitar_type"
+                value="{{ product.guitar_details.type if product and product.guitar_details else '' }}">
             <label>Количество струн</label>
-            <input type="number" name="strings_number" min="1" value="{{ product.guitar_details.strings_number if product and product.guitar_details else '' }}">
+            <input type="number" name="strings_number" min="1"
+                value="{{ product.guitar_details.strings_number if product and product.guitar_details else '' }}">
             <label>Материал корпуса</label>
-            <input type="text" name="body_material" value="{{ product.guitar_details.body_material if product and product.guitar_details else '' }}">
+            <input type="text" name="body_material"
+                value="{{ product.guitar_details.body_material if product and product.guitar_details else '' }}">
             <label>Материал грифа</label>
-            <input type="text" name="neck_material" value="{{ product.guitar_details.neck_material if product and product.guitar_details else '' }}">
+            <input type="text" name="neck_material"
+                value="{{ product.guitar_details.neck_material if product and product.guitar_details else '' }}">
             <label>Звукосниматели</label>
-            <input type="text" name="pickups" value="{{ product.guitar_details.pickups if product and product.guitar_details else '' }}">
+            <input type="text" name="pickups"
+                value="{{ product.guitar_details.pickups if product and product.guitar_details else '' }}">
         </div>
 
         <div id="accessory-fields" style="display:none;">
             <h4>Характеристики аксессуара</h4>
             <label>Назначение</label>
-            <input type="text" name="compatibility" value="{{ product.accessory_details.compatibility if product and product.accessory_details else '' }}">
+            <input type="text" name="compatibility"
+                value="{{ product.accessory_details.compatibility if product and product.accessory_details else '' }}">
             <label>Материал</label>
-            <input type="text" name="material" value="{{ product.accessory_details.material if product and product.accessory_details else '' }}">
+            <input type="text" name="material"
+                value="{{ product.accessory_details.material if product and product.accessory_details else '' }}">
             <label>Цвет</label>
-            <input type="text" name="color" value="{{ product.accessory_details.color if product and product.accessory_details else '' }}">
+            <input type="text" name="color"
+                value="{{ product.accessory_details.color if product and product.accessory_details else '' }}">
         </div>
 
         <button type="submit" class="add-btn">Сохранить товар</button>

@@ -28,9 +28,9 @@
                     <td class="prod-info">
                         <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
                         <div>{{ item.product.name }}</div>
-                        {% if item.product.stock_quantity == 0 %}
-                        <span class="awaiting-stock">❗ Ожидается поставка
-                            {% endif %}
+                        {% if item.quantity > item.product.stock_quantity %}
+                        <span class="awaiting-stock">❗ Ожидается поставка</span>
+                        {% endif %}
                     </td>
                     <td>
                         <form method="post" action="{{ url_for('cart.update_quantity', item_id=item.id) }}"

@@ -13,9 +13,7 @@ class CartRepository:
         if total_price > 5000:
             return Decimal(0)
         weekday = delivery_date.weekday()
-        if weekday in [SATURDAY - 5, SUNDAY - 5]:  # Saturday = 5, Sunday = 6
-            return Decimal(800)
-        return Decimal(500)
+        return Decimal(800 if weekday in (5, 6) else 500)
 
     def create_order(self, user_id, phone, address, delivery_date: date) -> Order:
         cart_items = self.db.session.execute(
@@ -29,34 +27,47 @@ class CartRepository:
         delivery_fee = self.calculate_delivery_fee(total_price, delivery_date)
         total_with_delivery = total_price + delivery_fee
 
-        any_out_of_stock = any(item.product.stock_quantity == 0 for item in cart_items)
+        any_out_of_stock = False
 
         order = Order(
             user_id=user_id,
-            status='waiting_for_stock' if any_out_of_stock else 'pending',
+            status='pending',
             type='regular',
             total_price=total_with_delivery,
             expected_delivery_date=delivery_date,
             created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
         )
-
         self.db.session.add(order)
         self.db.session.flush()
 
         for item in cart_items:
-            order_item = OrderItem(
+            ordered_qty = item.quantity
+            available_qty = item.product.stock_quantity
+
+            # Добавляем позицию в заказ
+            self.db.session.add(OrderItem(
                 order_id=order.id,
                 product_id=item.product_id,
-                quantity=item.quantity,
+                quantity=ordered_qty,
                 price=item.product.price
-            )
-            self.db.session.add(order_item)
+            ))
+
+            # Вычитаем товар (может уйти в минус)
+            item.product.stock_quantity -= ordered_qty
+
+            # Проверка нехватки
+            if ordered_qty > available_qty:
+                any_out_of_stock = True
+
+            # Удаляем из корзины
             self.db.session.delete(item)
+
+        # Статус заказа
+        order.status = 'waiting_for_stock' if any_out_of_stock else 'pending'
 
         self.db.session.commit()
         return order
-
 
     def get_cart_items_for_user(self, user_id):
         return self.db.session.execute(
