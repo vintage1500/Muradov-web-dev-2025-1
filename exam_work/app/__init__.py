@@ -2,11 +2,11 @@ from flask import Flask, request, session
 from flask_migrate import Migrate
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.extensions import db
-from app import models
-from app.routes.auth import bp as auth_bp, init_login_manager
-from app.routes.animals import bp as animals_bp
-from app.routes.adoptions import bp as adoptions_bp
+from exam_work.app.extensions import db
+from exam_work.app import models
+from exam_work.app.routes.auth import bp as auth_bp, init_login_manager
+from exam_work.app.routes.animals import bp as animals_bp
+from exam_work.app.routes.adoptions import bp as adoptions_bp
 
 
 def handle_sqlalchemy_error(err):
@@ -29,5 +29,5 @@ def create_app(test_config=None):
     app.register_blueprint(adoptions_bp)
 
     app.errorhandler(SQLAlchemyError)(handle_sqlalchemy_error)
-     
+
     return app

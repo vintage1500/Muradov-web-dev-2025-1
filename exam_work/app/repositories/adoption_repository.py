@@ -1,4 +1,4 @@
-from app.models import Adoption, Animal
+from exam_work.app.models import Adoption, Animal
 from datetime import datetime
 
 class AdoptionRepository:

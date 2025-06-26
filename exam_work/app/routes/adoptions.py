@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, url_for, flash, request
 from flask_login import login_required, current_user
-from app.extensions import db
-from app.repositories.adoption_repository import AdoptionRepository
+from exam_work.app.extensions import db
+from exam_work.app.repositories.adoption_repository import AdoptionRepository
 
 bp = Blueprint('adoptions', __name__, url_prefix='/adoptions')
 adoption_repo = AdoptionRepository(db)
@@ -49,7 +49,7 @@ def reject_adoption(adoption_id):
         flash('Ошибка при отклонении заявки.', 'danger')
 
     return redirect(request.referrer or url_for('animals.index'))
-    
+
 @bp.route('/<int:animal_id>/adopt', methods=['POST'])
 @login_required
 def adopt(animal_id):

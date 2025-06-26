@@ -1,4 +1,4 @@
-from app.models import Animal, Photo
+from exam_work.app.models import Animal, Photo
 
 class AnimalRepository:
     def __init__(self, db):
@@ -25,4 +25,3 @@ class AnimalRepository:
         self.db.session.delete(animal)
         self.db.session.commit()
 
-        

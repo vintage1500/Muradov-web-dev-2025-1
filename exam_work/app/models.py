@@ -55,4 +55,4 @@ class Adoption(db.Model):
     created_at = db.Column(db.Date, default=datetime.utcnow)
     status = db.Column(db.String(32), nullable=False, default='pending')
 
-    user = db.relationship('User', backref='adoptions') 
+    user = db.relationship('User', backref='adoptions')
